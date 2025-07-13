@@ -37,21 +37,6 @@ The app uses AI for:
                         └─────────────────┘
 ```
 
-## Gamification System
-
-- **XP Points**: Earned from completing goals, habits, and tasks, journaling notes
-- **Pet Evolution**: 4 stages based on user activity
-- **Streaks**: Visual reinforcement for consistency
-- **Achievements**: Unlock pet accessories and customizations
-
-### Gamification Flow
-```
-User Action → XP Calculation → Pet Evolution → Unlock Rewards
-     │              │              │              │
-     ▼              ▼              ▼              ▼
-Complete Task → +10 XP → Level Up Pet → New Accessories
-```
-
 ## Monetization Strategy
 
 ### Revenue Streams
@@ -76,7 +61,7 @@ Complete Task → +10 XP → Level Up Pet → New Accessories
 ## Tech Stack
 
 ### Frontend & Mobile
-- **Framework**: React Native with Expo (TypeScript)
+- **Framework**: React Native with Expo Development Builds (TypeScript)
 - **State Management**:  React Query
 - **Navigation**: Expo Router
 - **UI Components**: Tamagui
