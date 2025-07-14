@@ -13,7 +13,7 @@ GetGoing transforms aspirations into habits, habits into progress, and progress 
 - Focus Timer (Pomodoro-style) with session analytics
 - Virtual pet companion that evolves based on user activity
 - AI coaching with personalized insights and suggestions
-- Seamless offline access ensures productivity anytime, anywhere—even without an internet connection.
+- Seamless offline access ensures productivity anytime, anywhere—even without an internet connection
 
 ## AI Integration
 
@@ -62,18 +62,23 @@ The app uses AI for:
 
 ### Frontend & Mobile
 - **Framework**: React Native with Expo Development Builds (TypeScript)
-- **State Management**:  React Query
+- **Required Native Modules**: 
+  - expo-sqlite (database)
+  - expo-notifications (push notifications)
+  - expo-task-manager (background tasks)
+  - expo-file-system (file operations)
+  - expo-media-library (media handling)
+- **State Management**: React Query
 - **Navigation**: Expo Router
 - **UI Components**: Tamagui
-- **Local Storage**: SQLite with Expo SQLite
+- **Local Storage**: SQLite with expo-sqlite
 - **Offline Support**: React Query with background sync
 
 ### Backend & API
 - **Runtime**: Node.js (Use Supabase fully for backend - DB, Auth, Storage, Edge Functions)
-- **Database**: PostgreSQL (primary), Redis (caching) (Consider Neon or Supabase free tiers for Postgres + auth + storage to cut backend infra costs dramatically.)
-- **ORM**: Prisma or Drizzle ORM
+- **Database**: PostgreSQL (primary), Redis (caching) via Supabase
 - **Authentication**: Supabase Auth
-- **API Architecture**: RESTful API with WebSocket for real-time features (Consider tRPC → it reduces boilerplate, works beautifully with TypeScript, and cuts dev time.)
+- **API Architecture**: RESTful API with WebSocket for real-time features (Consider tRPC → it reduces boilerplate, works beautifully with TypeScript, and cuts dev time)
 
 ### AI & Analytics
 - **AI Provider**: OpenAI API (GPT-4) or Anthropic Claude
@@ -85,13 +90,13 @@ The app uses AI for:
 ### Cloud Infrastructure
 - **Hosting**: Vercel (backend) or Railway
 - **Database Hosting**: Supabase 
-- **File Storage**: Cloudinary or Supabase Storage
+- **File Storage**: Supabase Storage
 - **CDN**: Integrated with hosting provider
 
 ### Monetization & Payments
-- **Subscription Management**: RevenueCat
-- **Payment Processing**: Native store billing (mobile)
-- **In-App Purchases**: Expo In-App Purchases
+- **Subscription Management**: RevenueCat React Native SDK
+- **Payment Processing**: Native store billing via RevenueCat
+- **In-App Purchases**: RevenueCat (modern replacement for deprecated expo-in-app-purchases)
 
 ### DevOps & Deployment
 - **CI/CD**: GitHub Actions with Expo EAS
@@ -99,13 +104,16 @@ The app uses AI for:
 - **Code Quality**: ESLint, Prettier, Husky
 - **Testing**: Jest, React Native Testing Library
 
+### Development Build Setup
+- **Build Service**: Expo EAS Build
+- **Development Client**: Custom development build with required native modules
+- **Testing**: Physical devices required for push notifications and in-app purchases
+- **Prebuild**: Use `expo prebuild` to generate native code when needed
+
 ### Push Notifications
 - **Service**: Expo Notifications
 - **Scheduling**: Background tasks with Expo TaskManager
-
-
-
-
+- **Configuration**: Push notification credentials configured in development build
 
 ## Project Structure
 
@@ -154,7 +162,90 @@ src/
 2. **Adjust**: Modify goals and habits based on performance
 3. **Plan**: Set focus for the upcoming week
 
+## Development Setup
 
+### Prerequisites
+- Node.js (v18 or higher)
+- EAS CLI (for building): `npm install -g @expo/eas-cli`
+- iOS Simulator / Android Emulator or physical device
+- Expo account (create at expo.dev)
+
+### Installation
+```bash
+# Install dependencies
+npm install
+
+# Login to Expo (if not already logged in)
+eas login
+
+# Configure EAS Build
+eas build:configure
+
+# Create development build
+eas build --profile development --platform ios
+eas build --profile development --platform android
+
+# Install development build on device
+# Then start development server
+npx expo start --dev-client
+```
+
+### Key Configuration Files
+- `app.json` - Expo configuration with native modules
+- `eas.json` - EAS Build configuration
+- `metro.config.js` - Metro bundler configuration
+- `babel.config.js` - Babel configuration for React Native
+
+### Native Module Requirements
+The app requires a custom development build due to native modules:
+- Database operations (expo-sqlite)
+- Push notifications (expo-notifications)
+- Background tasks (expo-task-manager)
+- File system access (expo-file-system)
+- Media library access (expo-media-library)
+
+### Testing Strategy
+- **Unit Testing**: Jest, React Native Testing Library
+- **Device Testing**: Required for native features (notifications, payments, camera)
+- **Development Build Testing**: EAS Build for internal distribution
+- **E2E Testing**: Detox (optional for comprehensive testing)
+
+## Deployment
+
+### Development Builds
+```bash
+# iOS development build
+eas build --profile development --platform ios
+
+# Android development build
+eas build --profile development --platform android
+```
+
+### Production Builds
+```bash
+# iOS production build
+eas build --profile production --platform ios
+
+# Android production build  
+eas build --profile production --platform android
+```
+
+### App Store Submission
+```bash
+# Submit to App Store
+eas submit --platform ios
+
+# Submit to Google Play Store
+eas submit --platform android
+```
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Run tests: `npm test`
+5. Submit a pull request
 
 ## License
 
