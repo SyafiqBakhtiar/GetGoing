@@ -166,7 +166,7 @@ src/
 
 ### Prerequisites
 - Node.js (v18 or higher)
-- EAS CLI (for building): `npm install -g @expo/eas-cli`
+- EAS CLI (for building): `npm install -g eas-cli`
 - iOS Simulator / Android Emulator or physical device
 - Expo account (create at expo.dev)
 
