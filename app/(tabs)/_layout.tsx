@@ -27,17 +27,48 @@ export default function TabLayout() {
         }),
       }}>
       <Tabs.Screen
-        name="index"
+        name="home"
         options={{
           title: 'Home',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
+          tabBarIcon: ({ color, focused }) => (
+            <IconSymbol size={28} name={focused ? 'house.fill' : 'house'} color={color} />
+          ),
         }}
       />
       <Tabs.Screen
-        name="explore"
+        name="journey"
         options={{
-          title: 'Explore',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="paperplane.fill" color={color} />,
+          title: 'Journey',
+          tabBarIcon: ({ color, focused }) => (
+            <IconSymbol size={28} name={focused ? 'target' : 'target'} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="insights"
+        options={{
+          title: 'Insights',
+          tabBarIcon: ({ color, focused }) => (
+            <IconSymbol size={28} name={focused ? 'chart.bar.fill' : 'chart.bar'} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="pet"
+        options={{
+          title: 'Pet',
+          tabBarIcon: ({ color, focused }) => (
+            <IconSymbol size={28} name={focused ? 'heart.fill' : 'heart'} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="more"
+        options={{
+          title: 'More',
+          tabBarIcon: ({ color, focused }) => (
+            <IconSymbol size={28} name={focused ? 'ellipsis.circle.fill' : 'ellipsis.circle'} color={color} />
+          ),
         }}
       />
     </Tabs>

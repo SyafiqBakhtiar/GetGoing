@@ -43,7 +43,7 @@
 - Note any EAS configuration changes that might be required
 
 ## Command Reference for This Project
-- Development server: `npx expo start`
+- Development server: `npx expo start --dev-client --tunnel`
 - Health check: `npx expo-doctor`
 - Build development build: `eas build --profile development`
 - Build preview: `eas build --profile preview`
