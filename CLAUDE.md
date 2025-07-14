@@ -50,3 +50,25 @@
 - Build production: `eas build --profile production`
 - Deploy OTA update: `eas update`
 - Install EAS CLI: `npm install -g @expo/eas-cli`
+
+## Development Build Updates Required
+The project now includes native modules that require a new development build:
+- `expo-linear-gradient` - For gradient backgrounds in onboarding
+- `expo-haptics` - For button haptic feedback
+- `react-native-svg` - For animated SVG penguin
+
+**To update your development build:**
+```bash
+# Build new development build with updated native modules
+eas build --profile development --platform android
+# or for iOS
+eas build --profile development --platform ios
+
+# Install the new build on your device
+# Then start the development server
+npx expo start --dev-client
+```
+
+**Current Onboarding Status:**
+- ✅ Step 1 (Welcome Screen) - Implemented with animated penguin and snow effects
+- 🔄 Steps 2-4 - To be implemented next
