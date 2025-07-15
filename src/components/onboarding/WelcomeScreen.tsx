@@ -19,17 +19,14 @@ import { SnowEffect } from './SnowEffect';
 
 const { width, height } = Dimensions.get('window');
 
-// Responsive spacing system based on screen height
+// Responsive spacing system optimized for centered layout
 const getResponsiveSpacing = () => {
   const baseHeight = 800; // Reference height for scaling
   const scale = height / baseHeight;
   
   return {
-    penguinSectionHeight: Math.max(height * 0.32, 200), // Min 200px for small screens
-    brandingSectionHeight: Math.max(height * 0.16, 120), // Min 120px for text readability
-    buttonSectionHeight: Math.max(height * 0.14, 100), // Min 100px for touch targets
-    verticalPadding: Math.max(height * 0.03, 16), // Min 16px padding
-    marginBetweenSections: Math.max(height * 0.04, 20), // Min 20px between sections
+    buttonSectionHeight: Math.max(height * 0.18, 120), // Adequate space for button + trial note
+    verticalPadding: Math.max(height * 0.04, 20), // Consistent padding
   };
 };
 
@@ -124,29 +121,25 @@ export function WelcomeScreen({ onGetStarted }: WelcomeScreenProps) {
           },
         ]}
       >
-        {/* Penguin */}
-        <View style={[styles.penguinContainer, { 
-          height: spacing.penguinSectionHeight,
-          marginBottom: spacing.marginBetweenSections,
-        }]}>
-          <AnimatedPenguin size={Math.min(160, width * 0.4)} />
+        {/* Centered content: Penguin + Branding */}
+        <View style={styles.centeredContent}>
+          {/* Penguin */}
+          <View style={styles.penguinContainer}>
+            <AnimatedPenguin size={Math.min(160, width * 0.4)} />
+          </View>
+
+          {/* App branding */}
+          <View style={styles.brandingContainer}>
+            <Text style={styles.title}>GetGoing</Text>
+            <Text style={styles.subtitle}>
+              Build habits. Crush goals.{'\n'}Stay motivated.
+            </Text>
+          </View>
         </View>
 
-        {/* App branding */}
-        <View style={[styles.brandingContainer, {
-          minHeight: spacing.brandingSectionHeight,
-          marginBottom: spacing.marginBetweenSections,
-        }]}>
-          <Text style={styles.title}>GetGoing</Text>
-          <Text style={styles.subtitle}>
-            Build habits. Crush goals.{'\n'}Stay motivated.
-          </Text>
-        </View>
-
-        {/* Get Started button */}
+        {/* Get Started button - Fixed at bottom */}
         <View style={[styles.buttonContainer, {
           minHeight: spacing.buttonSectionHeight,
-          paddingBottom: Math.max(insets.bottom + spacing.verticalPadding, 20),
         }]}>
           <Button
             title="Get Started"
@@ -171,13 +164,19 @@ const styles = StyleSheet.create({
   content: {
     flex: 1,
     alignItems: 'center',
-    justifyContent: 'flex-end',
+    justifyContent: 'space-between',
     paddingHorizontal: Math.max(20, width * 0.08), // Responsive padding
+  },
+  centeredContent: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   penguinContainer: {
     alignItems: 'center',
     justifyContent: 'center',
     position: 'relative',
+    marginBottom: 32,
   },
   brandingContainer: {
     alignItems: 'center',
