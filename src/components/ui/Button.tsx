@@ -17,8 +17,8 @@ export interface ButtonProps {
   disabled?: boolean;
   loading?: boolean;
   hapticFeedback?: boolean;
-  style?: ViewStyle;
-  textStyle?: TextStyle;
+  style?: ViewStyle | ViewStyle[];
+  textStyle?: TextStyle | TextStyle[];
 }
 
 export function Button({

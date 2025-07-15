@@ -50,6 +50,7 @@ export interface PerformanceConfig {
   sparkleCount: number;
   enableComplexAnimations: boolean;
   staggerAnimations: boolean;
+  snowflakeMultiplier: number;
 }
 
 export function getPerformanceConfig(tier: PerformanceTier): PerformanceConfig {
@@ -60,6 +61,7 @@ export function getPerformanceConfig(tier: PerformanceTier): PerformanceConfig {
         sparkleCount: 6,
         enableComplexAnimations: true,
         staggerAnimations: false,
+        snowflakeMultiplier: 2.0, // 100% more snowflakes for high-end devices
       };
     case 'medium':
       return {
@@ -67,6 +69,7 @@ export function getPerformanceConfig(tier: PerformanceTier): PerformanceConfig {
         sparkleCount: 4,
         enableComplexAnimations: true,
         staggerAnimations: true,
+        snowflakeMultiplier: 1.4, // 40% more snowflakes for mid-range devices
       };
     case 'low':
       return {
@@ -74,6 +77,7 @@ export function getPerformanceConfig(tier: PerformanceTier): PerformanceConfig {
         sparkleCount: 2,
         enableComplexAnimations: false,
         staggerAnimations: true,
+        snowflakeMultiplier: 1.0, // No increase for low-end devices
       };
   }
 }

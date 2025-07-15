@@ -6,6 +6,7 @@ import {
   AppState,
   AppStateStatus,
   Dimensions,
+  DimensionValue,
   Easing,
   StyleSheet,
   Text,
@@ -33,6 +34,18 @@ import { AnimatedPenguin } from './AnimatedPenguin';
 import { SnowEffect } from './SnowEffect';
 
 const { width, height } = Dimensions.get('window');
+
+// Constants for spacing and animation
+const SPACING_MULTIPLIERS = {
+  SMALL_PHONE_MARGIN: 0.5,
+  PENGUIN_BOTTOM_MARGIN: 2,
+} as const;
+
+const ANIMATION_CONFIG = {
+  ENTRANCE_DURATION: 1000,
+  INITIAL_SLIDE_OFFSET: 50,
+  SUBTITLE_LINE_HEIGHT_MULTIPLIER: 1.3,
+} as const;
 
 // Comprehensive responsive configuration generator
 const createResponsiveConfiguration = (): ResponsiveConfiguration => {
@@ -86,7 +99,7 @@ const createResponsiveConfiguration = (): ResponsiveConfiguration => {
   const layout: WelcomeScreenLayout = {
     centeredContent: {
       flex: 1,
-      marginTop: responsiveConfig.isSmallPhone ? styles.spacing.vertical * 0.5 : undefined,
+      marginTop: responsiveConfig.isSmallPhone ? styles.spacing.vertical * SPACING_MULTIPLIERS.SMALL_PHONE_MARGIN : undefined,
     },
     buttonContainer: {
       minHeight: buttonContainerHeight,
@@ -111,7 +124,7 @@ interface WelcomeScreenProps {
 export function WelcomeScreen({ onGetStarted, responsiveConfig }: WelcomeScreenProps) {
   const insets = useSafeAreaInsets();
   const fadeAnim = useRef(new Animated.Value(0)).current;
-  const slideAnim = useRef(new Animated.Value(50)).current;
+  const slideAnim = useRef(new Animated.Value(ANIMATION_CONFIG.INITIAL_SLIDE_OFFSET)).current;
   
   const [appState, setAppState] = useState<AppStateStatus>(AppState.currentState);
   
@@ -119,11 +132,11 @@ export function WelcomeScreen({ onGetStarted, responsiveConfig }: WelcomeScreenP
   const config = useMemo(() => {
     if (responsiveConfig) return responsiveConfig;
     
-    const baseConfig = createResponsiveConfiguration();
+    // Create configuration with actual safe area insets
     const responsiveConfigLocal = getResponsiveConfig();
     const safeAreaSpacing = getSafeAreaSpacing(20, insets, responsiveConfigLocal);
+    const baseConfig = createResponsiveConfiguration();
     
-    // Update layout with actual safe area insets
     return {
       ...baseConfig,
       layout: {
@@ -143,22 +156,27 @@ export function WelcomeScreen({ onGetStarted, responsiveConfig }: WelcomeScreenP
     return () => subscription?.remove();
   }, []);
 
-  const shouldAnimate = appState === 'active';
 
   // Performance tier detection with responsive considerations
   const performanceTier = useMemo(() => detectPerformanceTier(), []);
+  const isSmallPhone = useMemo(() => {
+    const responsiveConfigLocal = getResponsiveConfig();
+    return responsiveConfigLocal.isSmallPhone;
+  }, []);
+  
   const performanceConfig = useMemo(() => {
     const baseConfig = getPerformanceConfig(performanceTier);
     // Reduce effects intensity on small phones for better performance
-    if (config.dimensions.isSmallPhone) {
+    if (isSmallPhone) {
       return {
         ...baseConfig,
         snowIntensity: 'light' as const,
         sparkleCount: Math.max(baseConfig.sparkleCount - 2, 1),
+        snowflakeMultiplier: 1.0, // No increase for small phones
       };
     }
     return baseConfig;
-  }, [performanceTier, config.dimensions.isSmallPhone]);
+  }, [performanceTier, isSmallPhone]);
 
 
   const handleGetStarted = async () => {
@@ -172,19 +190,18 @@ export function WelcomeScreen({ onGetStarted, responsiveConfig }: WelcomeScreenP
     Animated.parallel([
       Animated.timing(fadeAnim, {
         toValue: 1,
-        duration: 1000,
+        duration: ANIMATION_CONFIG.ENTRANCE_DURATION,
         easing: Easing.out(Easing.cubic),
         useNativeDriver: true,
       }),
       Animated.timing(slideAnim, {
         toValue: 0,
-        duration: 1000,
+        duration: ANIMATION_CONFIG.ENTRANCE_DURATION,
         easing: Easing.out(Easing.cubic),
         useNativeDriver: true,
       }),
     ]).start();
-
-  }, [fadeAnim, slideAnim]);
+  }, []); // Empty dependency array - animation should only run once on mount
 
   return (
     <View style={styles.container}>
@@ -223,7 +240,10 @@ export function WelcomeScreen({ onGetStarted, responsiveConfig }: WelcomeScreenP
       ]} />
       
       {/* Snow effect - adaptive intensity */}
-      <SnowEffect intensity={performanceConfig.snowIntensity} />
+      <SnowEffect 
+        intensity={performanceConfig.snowIntensity} 
+        multiplier={performanceConfig.snowflakeMultiplier}
+      />
 
       {/* Main content */}
       <Animated.View
@@ -250,7 +270,7 @@ export function WelcomeScreen({ onGetStarted, responsiveConfig }: WelcomeScreenP
           {/* Penguin */}
           <View style={[
             styles.penguinContainer,
-            { marginBottom: config.styles.spacing.component * 2 }
+            { marginBottom: config.styles.spacing.component * SPACING_MULTIPLIERS.PENGUIN_BOTTOM_MARGIN }
           ]}>
             <AnimatedPenguin size={config.styles.dimensions.penguin} />
           </View>
@@ -268,7 +288,7 @@ export function WelcomeScreen({ onGetStarted, responsiveConfig }: WelcomeScreenP
               styles.subtitle,
               {
                 fontSize: config.styles.fontSize.subtitle,
-                lineHeight: config.styles.fontSize.subtitle * 1.3,
+                lineHeight: config.styles.fontSize.subtitle * ANIMATION_CONFIG.SUBTITLE_LINE_HEIGHT_MULTIPLIER,
               }
             ]}>
               Build habits. Crush goals.{'\n'}Stay motivated.
@@ -292,15 +312,15 @@ export function WelcomeScreen({ onGetStarted, responsiveConfig }: WelcomeScreenP
             style={[
               styles.getStartedButton,
               {
-                width: config.styles.dimensions.button.width,
+                width: config.styles.dimensions.button.width as DimensionValue,
                 maxWidth: config.styles.dimensions.button.maxWidth,
                 minHeight: config.styles.dimensions.button.minHeight,
-              } as any
+              }
             ]}
             textStyle={[
               styles.buttonText,
               { fontSize: config.styles.fontSize.button }
-            ] as any}
+            ]}
           />
           <Text style={[
             styles.trialNote,
@@ -342,9 +362,6 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#FFFFFF',
     textAlign: 'center',
-    textShadowColor: 'rgba(0, 0, 0, 0.3)',
-    textShadowOffset: { width: 0, height: 2 },
-    textShadowRadius: 4,
   },
   subtitle: {
     fontWeight: '300',

@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState, useMemo } from 'react';
-import { View, Animated, Dimensions, StyleSheet, AppState, AppStateStatus } from 'react-native';
+import { View, Animated, Dimensions, StyleSheet, AppState, AppStateStatus, Easing } from 'react-native';
 
 const { width, height } = Dimensions.get('window');
 
@@ -11,6 +11,7 @@ interface SnowflakeProps {
   duration: number;
   delay: number;
   initialX: number;
+  initialY: number;
   shouldAnimate: boolean;
 }
 
@@ -22,9 +23,10 @@ const Snowflake = React.memo(function Snowflake({
   duration, 
   delay, 
   initialX, 
+  initialY, 
   shouldAnimate 
 }: SnowflakeProps) {
-  const translateY = useRef(new Animated.Value(-10)).current;
+  const translateY = useRef(new Animated.Value(initialY)).current;
   const translateX = useRef(new Animated.Value(0)).current;
   const rotate = useRef(new Animated.Value(0)).current;
   const animationRef = useRef<Animated.CompositeAnimation | null>(null);
@@ -35,43 +37,55 @@ const Snowflake = React.memo(function Snowflake({
       return;
     }
 
-    const animateSnowflake = () => {
-      // Reset position
-      translateY.setValue(-10);
-      translateX.setValue(0);
-      rotate.setValue(0);
+    // Pre-calculate random drift to avoid render-time calculations
+    const horizontalDrift = (Math.random() - 0.5) * 30; // -15 to 15 range
+    const shouldRotate = index % 2 === 0;
 
-      // Create falling animation with wind effect
-      animationRef.current = Animated.parallel([
+    // Set initial position
+    translateY.setValue(initialY);
+    translateX.setValue(0);
+    rotate.setValue(0);
+
+    const animations = [
+      Animated.loop(
         Animated.timing(translateY, {
           toValue: height + 50,
           duration: duration,
+          easing: Easing.linear,
           useNativeDriver: true,
         }),
+        { resetBeforeIteration: true }
+      ),
+      Animated.loop(
         Animated.timing(translateX, {
-          toValue: Math.random() * 40 - 20, // Slight horizontal drift
+          toValue: horizontalDrift,
           duration: duration,
+          easing: Easing.inOut(Easing.sin),
           useNativeDriver: true,
         }),
-        Animated.timing(rotate, {
-          toValue: 360,
-          duration: duration,
-          useNativeDriver: true,
-        }),
-      ]);
+        { resetBeforeIteration: true }
+      ),
+    ];
 
-      animationRef.current.start(({ finished }) => {
-        if (finished && shouldAnimate) {
-          // Restart animation only if still should animate
-          animateSnowflake();
-        }
-      });
-    };
+    if (shouldRotate) {
+      animations.push(
+        Animated.loop(
+          Animated.timing(rotate, {
+            toValue: 360,
+            duration: duration,
+            easing: Easing.linear,
+            useNativeDriver: true,
+          }),
+          { resetBeforeIteration: true }
+        )
+      );
+    }
 
     // Start with delay
     const timer = setTimeout(() => {
       if (shouldAnimate) {
-        animateSnowflake();
+        animationRef.current = Animated.parallel(animations);
+        animationRef.current.start();
       }
     }, delay);
 
@@ -79,7 +93,7 @@ const Snowflake = React.memo(function Snowflake({
       clearTimeout(timer);
       animationRef.current?.stop();
     };
-  }, [translateY, translateX, rotate, duration, delay, shouldAnimate]);
+  }, [translateY, translateX, rotate, duration, delay, shouldAnimate, initialY]);
 
   const rotateInterpolate = rotate.interpolate({
     inputRange: [0, 360],
@@ -133,55 +147,55 @@ const WindParticle = React.memo(function WindParticle({
       return;
     }
 
-    const animateWindParticle = () => {
-      // Reset position
-      translateX.setValue(-10);
-      translateY.setValue(initialY);
-      opacity.setValue(0);
+    // Set initial position
+    translateX.setValue(-10);
+    translateY.setValue(initialY);
+    opacity.setValue(0);
 
-      // Create wind blowing animation
-      animationRef.current = Animated.parallel([
+    // Create wind blowing animation with smooth looping
+    const windAnimation = Animated.loop(
+      Animated.parallel([
         Animated.timing(translateX, {
           toValue: width + 20,
           duration: duration,
+          easing: Easing.linear,
           useNativeDriver: true,
         }),
         Animated.timing(translateY, {
           toValue: initialY - 20, // Slight vertical drift
           duration: duration,
+          easing: Easing.inOut(Easing.sin),
           useNativeDriver: true,
         }),
         Animated.sequence([
           Animated.timing(opacity, {
             toValue: 1,
             duration: duration * 0.1,
+            easing: Easing.out(Easing.quad),
             useNativeDriver: true,
           }),
           Animated.timing(opacity, {
             toValue: 1,
             duration: duration * 0.8,
+            easing: Easing.linear,
             useNativeDriver: true,
           }),
           Animated.timing(opacity, {
             toValue: 0,
             duration: duration * 0.1,
+            easing: Easing.in(Easing.quad),
             useNativeDriver: true,
           }),
         ]),
-      ]);
-
-      animationRef.current.start(({ finished }) => {
-        if (finished && shouldAnimate) {
-          // Restart animation only if still should animate
-          animateWindParticle();
-        }
-      });
-    };
+      ]),
+      { resetBeforeIteration: true }
+    );
 
     // Start with delay
     const timer = setTimeout(() => {
       if (shouldAnimate) {
-        animateWindParticle();
+        animationRef.current = windAnimation;
+        animationRef.current.start();
       }
     }, delay);
 
@@ -210,9 +224,10 @@ const WindParticle = React.memo(function WindParticle({
 
 interface SnowEffectProps {
   intensity?: 'light' | 'medium' | 'heavy';
+  multiplier?: number;
 }
 
-export function SnowEffect({ intensity = 'medium' }: SnowEffectProps) {
+export function SnowEffect({ intensity = 'medium', multiplier = 1.0 }: SnowEffectProps) {
   const [appState, setAppState] = useState<AppStateStatus>(AppState.currentState);
   
   // Handle app state changes for performance optimization
@@ -228,58 +243,78 @@ export function SnowEffect({ intensity = 'medium' }: SnowEffectProps) {
   const shouldAnimate = appState === 'active';
 
   const getMultiLayerConfig = () => {
+    const applyMultiplier = (count: number) => Math.round(count * multiplier);
+    
     switch (intensity) {
       case 'light':
         return {
           layers: [
-            { count: 8, character: '❄', sizes: [8, 10], opacities: [0.3, 0.4], durations: [15000, 18000] },
-            { count: 6, character: '❅', sizes: [6, 8], opacities: [0.2, 0.3], durations: [18000, 22000] },
-            { count: 4, character: '❆', sizes: [4, 6], opacities: [0.1, 0.2], durations: [20000, 25000] },
+            { count: applyMultiplier(8), character: '❄', sizes: [18, 22], opacities: [0.6, 0.7], durations: [15000, 18750] },
+            { count: applyMultiplier(5), character: '❅', sizes: [16, 18], opacities: [0.5, 0.6], durations: [18750, 26250] },
+            { count: applyMultiplier(3), character: '❆', sizes: [14, 16], opacities: [0.4, 0.5], durations: [22500, 30000] },
           ],
-          windParticles: { count: 3, duration: 4000 },
+          windParticles: { count: applyMultiplier(3), duration: 6000 },
         };
       case 'heavy':
         return {
           layers: [
-            { count: 20, character: '❄', sizes: [12, 16, 20], opacities: [0.7, 0.8], durations: [8000, 10000, 12000] },
-            { count: 15, character: '❅', sizes: [8, 12, 16], opacities: [0.5, 0.6], durations: [12000, 15000, 18000] },
-            { count: 10, character: '❆', sizes: [6, 8, 10], opacities: [0.3, 0.4], durations: [18000, 22000, 26000] },
+            { count: applyMultiplier(18), character: '❄', sizes: [24, 28, 32], opacities: [0.8, 0.9], durations: [15000, 18750] },
+            { count: applyMultiplier(12), character: '❅', sizes: [20, 24, 28], opacities: [0.7, 0.8], durations: [18750, 26250] },
+            { count: applyMultiplier(6), character: '❆', sizes: [16, 20, 24], opacities: [0.6, 0.7], durations: [22500, 30000] },
           ],
-          windParticles: { count: 8, duration: 3000 },
+          windParticles: { count: applyMultiplier(6), duration: 4500 },
         };
       default: // medium - optimized for performance
         return {
           layers: [
-            { count: 15, character: '❄', sizes: [12, 16, 20], opacities: [0.8], durations: [8000, 10000, 12000] },
-            { count: 10, character: '❅', sizes: [8, 12, 14], opacities: [0.6], durations: [12000, 15000, 18000] },
-            { count: 8, character: '❆', sizes: [6, 8, 10], opacities: [0.4], durations: [18000, 22000, 26000] },
+            { count: applyMultiplier(15), character: '❄', sizes: [22, 26, 30], opacities: [0.9], durations: [15000, 18750] },
+            { count: applyMultiplier(10), character: '❅', sizes: [18, 22, 26], opacities: [0.8], durations: [18750, 26250] },
+            { count: applyMultiplier(5), character: '❆', sizes: [16, 18, 20], opacities: [0.7], durations: [22500, 30000] },
           ],
-          windParticles: { count: 5, duration: 4000 },
+          windParticles: { count: applyMultiplier(4), duration: 6000 },
         };
     }
   };
 
   const config = getMultiLayerConfig();
 
-  // Pre-calculate positions to avoid render-time Math.random() calls
+  // Pre-calculate positions using easing-based distribution for better performance
   const snowflakePositions = useMemo(() => {
+    let globalIndex = 0;
+    const totalSnowflakes = config.layers.reduce((sum, layer) => sum + layer.count, 0);
+    
     return config.layers.flatMap((layer) => 
-      Array.from({ length: layer.count }, () => ({
-        x: Math.random() * width,
-        size: layer.sizes[Math.floor(Math.random() * layer.sizes.length)],
-        opacity: layer.opacities[Math.floor(Math.random() * layer.opacities.length)],
-        duration: layer.durations[Math.floor(Math.random() * layer.durations.length)],
-        delay: Math.random() * 5000, // Stagger start times
-      }))
+      Array.from({ length: layer.count }, (_, index) => {
+        const normalizedIndex = globalIndex / Math.max(totalSnowflakes - 1, 1); // 0 to 1
+        globalIndex++;
+        
+        // Use easing functions for natural distribution
+        const shouldStartInScreen = globalIndex % 2 === 0; // Alternating pattern
+        const initialY = shouldStartInScreen 
+          ? Easing.out(Easing.quad)(normalizedIndex) * (height / 4) // Top 25% using easing curve
+          : -10; // Traditional start position above screen
+        
+        return {
+          x: (globalIndex * 73) % width, // Prime number distribution for even spread
+          initialY: initialY,
+          size: layer.sizes[Math.floor(Easing.linear(normalizedIndex) * layer.sizes.length) % layer.sizes.length],
+          opacity: layer.opacities[Math.floor(Easing.linear(normalizedIndex) * layer.opacities.length) % layer.opacities.length],
+          duration: layer.durations[Math.floor(Easing.linear(normalizedIndex) * layer.durations.length) % layer.durations.length],
+          delay: Easing.in(Easing.cubic)(normalizedIndex) * 1000, // Progressive 0-1s delays
+        };
+      })
     );
-  }, [config]);
+  }, [config, height, width]);
 
   const windParticlePositions = useMemo(() => {
-    return Array.from({ length: config.windParticles.count }, () => ({
-      y: Math.random() * height,
-      delay: Math.random() * 2000,
-    }));
-  }, [config]);
+    return Array.from({ length: config.windParticles.count }, (_, index) => {
+      const normalizedIndex = index / Math.max(config.windParticles.count - 1, 1);
+      return {
+        y: Easing.inOut(Easing.quad)(normalizedIndex) * height, // Distributed across height
+        delay: Easing.out(Easing.cubic)(normalizedIndex) * 2000, // Staggered 0-2s delays
+      };
+    });
+  }, [config, height]);
 
   const allSnowflakes = config.layers.flatMap((layer, layerIndex) => 
     Array.from({ length: layer.count }, (_, index) => {
@@ -296,6 +331,7 @@ export function SnowEffect({ intensity = 'medium' }: SnowEffectProps) {
           duration={pos.duration}
           delay={pos.delay}
           initialX={pos.x}
+          initialY={pos.initialY}
           shouldAnimate={shouldAnimate}
         />
       );
@@ -332,16 +368,17 @@ const styles = StyleSheet.create({
   },
   snowflake: {
     position: 'absolute',
-    color: 'rgba(255, 255, 255, 0.8)',
-    textShadowColor: 'rgba(255, 255, 255, 0.3)',
-    textShadowOffset: { width: 0, height: 0 },
-    textShadowRadius: 4,
+    color: 'rgba(255, 255, 255, 0.95)',
+    textShadowColor: 'rgba(255, 255, 255, 0.6)',
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 6,
+    fontWeight: 'bold',
   },
   windParticle: {
     position: 'absolute',
-    width: 2,
-    height: 2,
-    backgroundColor: 'rgba(255, 255, 255, 0.3)',
-    borderRadius: 1,
+    width: 4,
+    height: 4,
+    backgroundColor: 'rgba(255, 255, 255, 0.5)',
+    borderRadius: 2,
   },
 });
