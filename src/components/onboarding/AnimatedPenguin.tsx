@@ -1,13 +1,13 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Animated, Easing, AppState, AppStateStatus } from 'react-native';
-import Svg, { 
-  Ellipse, 
-  Path, 
-  Circle, 
-  Defs, 
-  LinearGradient, 
-  RadialGradient, 
-  Stop 
+import { Animated, AppState, AppStateStatus, Easing } from 'react-native';
+import Svg, {
+  Circle,
+  Defs,
+  Ellipse,
+  LinearGradient,
+  Path,
+  RadialGradient,
+  Stop
 } from 'react-native-svg';
 
 interface AnimatedPenguinProps {
@@ -223,6 +223,40 @@ export function AnimatedPenguin({ size = 160 }: AnimatedPenguinProps) {
   });
 
   return (
+    <>
+     {/* Static ice floor - not animated */}
+     <Svg
+     width={size * 1.8}
+     height={size * 1.2}
+     viewBox="0 0 500 320"
+     style={{
+       position: 'absolute',
+       zIndex: -1,
+     }}
+   >
+     <Defs>
+          {/* Ice floor gradient - converted from CSS radial-gradient */}
+          <RadialGradient id="staticIceFloorGradient" cx="50%" cy="50%" r="100%">
+            <Stop offset="0%" stopColor="rgba(240, 249, 255, 0.95)" />
+            <Stop offset="20%" stopColor="rgba(219, 234, 254, 0.85)" />
+            <Stop offset="40%" stopColor="rgba(147, 197, 253, 0.75)" />
+            <Stop offset="60%" stopColor="rgba(59, 130, 246, 0.6)" />
+            <Stop offset="75%" stopColor="rgba(29, 78, 216, 0.4)" />
+            <Stop offset="90%" stopColor="rgba(30, 58, 138, 0.2)" />
+            <Stop offset="100%" stopColor="transparent" />
+          </RadialGradient>
+        </Defs>
+          {/* Ice floor - larger fixed size */}
+          <Ellipse
+          cx="250"
+          cy="260"
+          rx="220"
+          ry="30"
+          fill="url(#staticIceFloorGradient)"
+        />
+      </Svg>
+
+    {/* Animated penguin */}
     <Animated.View
       style={{
         transform: [
@@ -340,5 +374,6 @@ export function AnimatedPenguin({ size = 160 }: AnimatedPenguinProps) {
         />
       </Svg>
     </Animated.View>
+    </>
   );
 }
