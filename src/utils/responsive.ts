@@ -419,7 +419,8 @@ function getDeviceViewBoxScaling(deviceType: DeviceType): { width: number; heigh
 
 export function getResponsiveViewBox(
   baseViewBoxString: string,
-  config?: ResponsiveConfig
+  config?: ResponsiveConfig,
+  debug?: boolean
 ): string {
   const responsiveConfig = config || getResponsiveConfig();
   const baseViewBox = parseViewBox(baseViewBoxString);
@@ -437,8 +438,8 @@ export function getResponsiveViewBox(
     responsiveConfig.deviceType
   );
   
-  // Debug logging (only in development)
-  if (__DEV__) {
+  // Debug logging (only in development and when debug is enabled)
+  if (__DEV__ && debug) {
     console.log('ViewBox Debug:', {
       original: baseViewBoxString,
       parsed: baseViewBox,

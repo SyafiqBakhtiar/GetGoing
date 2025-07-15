@@ -278,7 +278,10 @@ export function WelcomeScreen({ onGetStarted, responsiveConfig }: WelcomeScreenP
                 styles.penguinContainer,
                 styles.penguinContainerLandscape,
               ]}>
-                <AnimatedPenguin size={config.styles.dimensions.penguin} />
+                <AnimatedPenguin 
+                  size={config.styles.dimensions.penguin} 
+                  useStaticViewBox={config.dimensions.deviceType === 'phone'}
+                />
               </View>
             </View>
 
@@ -364,7 +367,10 @@ export function WelcomeScreen({ onGetStarted, responsiveConfig }: WelcomeScreenP
                 styles.penguinContainer,
                 { marginBottom: config.styles.spacing.component * SPACING_MULTIPLIERS.PENGUIN_BOTTOM_MARGIN }
               ]}>
-                <AnimatedPenguin size={config.styles.dimensions.penguin} />
+                <AnimatedPenguin 
+                  size={config.styles.dimensions.penguin} 
+                  useStaticViewBox={config.dimensions.deviceType === 'phone'}
+                />
               </View>
 
               {/* App branding */}

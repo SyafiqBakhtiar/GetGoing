@@ -16,16 +16,16 @@ import { getResponsiveConfig, getResponsiveViewBox } from '../../utils/responsiv
 // Create animated versions of SVG components
 const AnimatedG = Animated.createAnimatedComponent(G);
 const AnimatedEllipse = Animated.createAnimatedComponent(Ellipse);
-const AnimatedPath = Animated.createAnimatedComponent(Path);
 const AnimatedCircle = Animated.createAnimatedComponent(Circle);
 
 interface AnimatedPenguinProps {
   size?: number;
   useDynamicViewBox?: boolean; // Optional prop to disable dynamic viewBox
   useStaticViewBox?: boolean; // Force static viewBox (overrides useDynamicViewBox)
+  debug?: boolean; // Optional prop to enable debug logging
 }
 
-export function AnimatedPenguin({ size = 160, useDynamicViewBox = true, useStaticViewBox = false }: AnimatedPenguinProps) {
+export function AnimatedPenguin({ size = 160, useDynamicViewBox = true, useStaticViewBox = false, debug = false }: AnimatedPenguinProps) {
   const waddleAnim = useRef(new Animated.Value(0)).current;
   const bobAnim = useRef(new Animated.Value(0)).current;
   const wingLeftAnim = useRef(new Animated.Value(0)).current;
@@ -41,18 +41,18 @@ export function AnimatedPenguin({ size = 160, useDynamicViewBox = true, useStati
   
   const [appState, setAppState] = useState<AppStateStatus>(AppState.currentState);
   const animationsRef = useRef<Animated.CompositeAnimation[]>([]);
+  const timeoutsRef = useRef<NodeJS.Timeout[]>([]);
   
   // Responsive configuration for landscape optimization
   const responsiveConfig = useMemo(() => getResponsiveConfig(), []);
   const isLandscape = responsiveConfig.isLandscape;
   
-  // Auto-detect mobile and default to static viewBox for mobile phones
+  // Auto-detect mobile and default to static viewBox for ALL mobile phones
   const shouldUseStaticViewBox = useMemo(() => {
     if (useStaticViewBox) return true;
     
-    // Auto-enable static viewBox for mobile phones with very tall aspect ratios
-    const isMobilePhone = responsiveConfig.deviceType === 'phone' && 
-                         responsiveConfig.aspectRatio < 0.7;
+    // Auto-enable static viewBox for ALL mobile phones (simplified logic)
+    const isMobilePhone = responsiveConfig.deviceType === 'phone';
     
     return isMobilePhone;
   }, [useStaticViewBox, responsiveConfig]);
@@ -87,7 +87,7 @@ export function AnimatedPenguin({ size = 160, useDynamicViewBox = true, useStati
   // Dynamic viewBox calculations with caching and fallback
   const iceFloorViewBox = useMemo(() => {
     if (shouldUseStaticViewBox || !useDynamicViewBox) {
-      if (__DEV__) {
+      if (__DEV__ && debug) {
         console.log('AnimatedPenguin: Using static viewBox for ice floor', {
           shouldUseStaticViewBox,
           useDynamicViewBox,
@@ -97,12 +97,20 @@ export function AnimatedPenguin({ size = 160, useDynamicViewBox = true, useStati
       }
       return '0 0 500 320'; // Force static viewBox or fallback
     }
-    return getResponsiveViewBox('0 0 500 320', responsiveConfig);
-  }, [responsiveConfig, useDynamicViewBox, shouldUseStaticViewBox]);
+    
+    try {
+      return getResponsiveViewBox('0 0 500 320', responsiveConfig, debug);
+    } catch (error) {
+      if (__DEV__) {
+        console.error('AnimatedPenguin: Error calculating ice floor viewBox, using fallback:', error);
+      }
+      return '0 0 500 320'; // Fallback to static viewBox on error
+    }
+  }, [responsiveConfig, useDynamicViewBox, shouldUseStaticViewBox, debug]);
   
   const penguinViewBox = useMemo(() => {
     if (shouldUseStaticViewBox || !useDynamicViewBox) {
-      if (__DEV__) {
+      if (__DEV__ && debug) {
         console.log('AnimatedPenguin: Using static viewBox for penguin', {
           shouldUseStaticViewBox,
           useDynamicViewBox,
@@ -112,8 +120,16 @@ export function AnimatedPenguin({ size = 160, useDynamicViewBox = true, useStati
       }
       return '0 0 272 261'; // Force static viewBox or fallback
     }
-    return getResponsiveViewBox('0 0 272 261', responsiveConfig);
-  }, [responsiveConfig, useDynamicViewBox, shouldUseStaticViewBox]);
+    
+    try {
+      return getResponsiveViewBox('0 0 272 261', responsiveConfig, debug);
+    } catch (error) {
+      if (__DEV__) {
+        console.error('AnimatedPenguin: Error calculating penguin viewBox, using fallback:', error);
+      }
+      return '0 0 272 261'; // Fallback to static viewBox on error
+    }
+  }, [responsiveConfig, useDynamicViewBox, shouldUseStaticViewBox, debug]);
 
   // Handle app state changes for performance optimization
   useEffect(() => {
@@ -135,7 +151,7 @@ export function AnimatedPenguin({ size = 160, useDynamicViewBox = true, useStati
         Animated.timing(waddleAnim, {
           toValue: 1,
           duration: 1500,
-          easing: Easing.inOut(Easing.ease),
+          easing: Easing.inOut(Easing.quad),
           useNativeDriver: true,
         })
       );
@@ -144,7 +160,7 @@ export function AnimatedPenguin({ size = 160, useDynamicViewBox = true, useStati
         Animated.timing(bobAnim, {
           toValue: 1,
           duration: 1500,
-          easing: Easing.inOut(Easing.ease),
+          easing: Easing.inOut(Easing.quad),
           useNativeDriver: true,
         })
       );
@@ -153,7 +169,7 @@ export function AnimatedPenguin({ size = 160, useDynamicViewBox = true, useStati
         Animated.timing(wingLeftAnim, {
           toValue: 1,
           duration: 1500,
-          easing: Easing.inOut(Easing.ease),
+          easing: Easing.inOut(Easing.quad),
           useNativeDriver: true,
         })
       );
@@ -162,7 +178,7 @@ export function AnimatedPenguin({ size = 160, useDynamicViewBox = true, useStati
         Animated.timing(wingRightAnim, {
           toValue: 1,
           duration: 1500,
-          easing: Easing.inOut(Easing.ease),
+          easing: Easing.inOut(Easing.quad),
           useNativeDriver: true,
         })
       );
@@ -171,7 +187,7 @@ export function AnimatedPenguin({ size = 160, useDynamicViewBox = true, useStati
         Animated.timing(footLeftAnim, {
           toValue: 1,
           duration: 1500,
-          easing: Easing.inOut(Easing.ease),
+          easing: Easing.inOut(Easing.quad),
           useNativeDriver: true,
         })
       );
@@ -180,7 +196,7 @@ export function AnimatedPenguin({ size = 160, useDynamicViewBox = true, useStati
         Animated.timing(footRightAnim, {
           toValue: 1,
           duration: 1500,
-          easing: Easing.inOut(Easing.ease),
+          easing: Easing.inOut(Easing.quad),
           useNativeDriver: true,
         })
       );
@@ -189,7 +205,7 @@ export function AnimatedPenguin({ size = 160, useDynamicViewBox = true, useStati
         Animated.timing(shimmerAnim, {
           toValue: 1,
           duration: 3000,
-          easing: Easing.inOut(Easing.ease),
+          easing: Easing.inOut(Easing.quad),
           useNativeDriver: true,
         })
       );
@@ -199,7 +215,7 @@ export function AnimatedPenguin({ size = 160, useDynamicViewBox = true, useStati
         Animated.timing(sparkle1Anim, {
           toValue: 1,
           duration: 2000,
-          easing: Easing.inOut(Easing.ease),
+          easing: Easing.inOut(Easing.quad),
           useNativeDriver: true,
         })
       );
@@ -208,7 +224,7 @@ export function AnimatedPenguin({ size = 160, useDynamicViewBox = true, useStati
         Animated.timing(sparkle2Anim, {
           toValue: 1,
           duration: 2500,
-          easing: Easing.inOut(Easing.ease),
+          easing: Easing.inOut(Easing.quad),
           useNativeDriver: true,
         })
       );
@@ -217,7 +233,7 @@ export function AnimatedPenguin({ size = 160, useDynamicViewBox = true, useStati
         Animated.timing(sparkle3Anim, {
           toValue: 1,
           duration: 3000,
-          easing: Easing.inOut(Easing.ease),
+          easing: Easing.inOut(Easing.quad),
           useNativeDriver: true,
         })
       );
@@ -250,18 +266,32 @@ export function AnimatedPenguin({ size = 160, useDynamicViewBox = true, useStati
       shimmerAnimation.start();
       
       // Start sparkle animations with staggered delays (adaptive)
-      if (sparkleCount >= 1) setTimeout(() => sparkle1Animation.start(), 0);
-      if (sparkleCount >= 2) setTimeout(() => sparkle2Animation.start(), 600);
-      if (sparkleCount >= 3) setTimeout(() => sparkle3Animation.start(), 1200);
+      if (sparkleCount >= 1) {
+        const timeout1 = setTimeout(() => sparkle1Animation.start(), 0);
+        timeoutsRef.current.push(timeout1);
+      }
+      if (sparkleCount >= 2) {
+        const timeout2 = setTimeout(() => sparkle2Animation.start(), 600);
+        timeoutsRef.current.push(timeout2);
+      }
+      if (sparkleCount >= 3) {
+        const timeout3 = setTimeout(() => sparkle3Animation.start(), 1200);
+        timeoutsRef.current.push(timeout3);
+      }
     } else {
       // Stop all animations when app goes to background
       animationsRef.current.forEach(animation => animation.stop());
       animationsRef.current = [];
+      
+      // Clear all timeouts
+      timeoutsRef.current.forEach(timeout => clearTimeout(timeout));
+      timeoutsRef.current = [];
     }
 
     return () => {
       // Cleanup on unmount
       animationsRef.current.forEach(animation => animation.stop());
+      timeoutsRef.current.forEach(timeout => clearTimeout(timeout));
     };
   }, [appState, waddleAnim, bobAnim, wingLeftAnim, wingRightAnim, footLeftAnim, footRightAnim, shimmerAnim, sparkle1Anim, sparkle2Anim, sparkle3Anim, sparkleCount]);
 
@@ -322,10 +352,6 @@ export function AnimatedPenguin({ size = 160, useDynamicViewBox = true, useStati
     outputRange: [1, 1, 1.2, 1],
   });
 
-  const shimmerOpacity = shimmerAnim.interpolate({
-    inputRange: [0, 0.5, 1],
-    outputRange: [0.4, 0.8, 0.4],
-  });
 
   // Sparkle opacity interpolations
   const sparkle1Opacity = sparkle1Anim.interpolate({
@@ -374,12 +400,6 @@ export function AnimatedPenguin({ size = 160, useDynamicViewBox = true, useStati
             <Stop offset="100%" stopColor="rgba(255, 255, 255, 0.0)" />
           </LinearGradient>
           
-          {/* Ice reflection gradient for shine effect */}
-   {/*        <LinearGradient id="iceReflectionGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-            <Stop offset="0%" stopColor="rgba(255, 255, 255, 0.4)" />
-            <Stop offset="50%" stopColor="rgba(255, 255, 255, 0.8)" />
-            <Stop offset="100%" stopColor="rgba(255, 255, 255, 0.2)" />
-          </LinearGradient> */}
           
           {/* Ice texture pattern */}
           <LinearGradient id="iceTextureGradient" x1="0%" y1="0%" x2="0%" y2="100%">
@@ -428,32 +448,6 @@ export function AnimatedPenguin({ size = 160, useDynamicViewBox = true, useStati
           strokeWidth="1"
         />
         
-          {/* Main ice floor with organic edges */}
- {/*          <Path
-          d="M35 260 Q45 250, 65 252 Q85 248, 110 253 Q140 249, 170 254 Q200 251, 230 255 Q260 252, 290 256 Q320 253, 350 257 Q380 254, 410 258 Q440 255, 465 262 Q460 275, 435 272 Q405 278, 375 274 Q345 279, 315 275 Q285 280, 255 276 Q225 281, 195 277 Q165 282, 135 278 Q105 283, 75 279 Q45 284, 35 270 Z"
-          fill="url(#staticIceFloorGradient)"
-        /> */}
-        
-        {/* Ice reflection shine overlay with organic edges and shimmer */}
-  {/*       <AnimatedPath
-          d="M70 255 Q100 248, 130 250 Q160 247, 190 251 Q220 248, 250 252 Q280 249, 310 253 Q340 250, 370 254 Q400 251, 430 255 Q420 265, 390 262 Q360 267, 330 263 Q300 268, 270 264 Q240 269, 210 265 Q180 270, 150 266 Q120 271, 90 267 Q70 272, 70 260 Z"
-          fill="url(#iceReflectionGradient)"
-          opacity={shimmerOpacity}
-        /> */}
-        
-        {/* Crystalline texture patterns */}
-     {/*    <Path
-          d="M120 250 L130 245 L140 250 L130 255 Z M180 252 L190 247 L200 252 L190 257 Z M300 248 L310 243 L320 248 L310 253 Z"
-          fill="url(#iceTextureGradient)"
-          opacity="0.4"
-        /> */}
-        
-        {/* Additional subtle ice crystals */}
-     {/*    <Path
-          d="M160 265 L165 260 L170 265 L165 270 Z M240 268 L245 263 L250 268 L245 273 Z M280 266 L285 261 L290 266 L285 271 Z"
-          fill="rgba(255, 255, 255, 0.25)"
-          opacity="0.5"
-        /> */}
         
         {/* Enhanced ice floor sparkles with glow (responsive positioning) */}
         {sparkleCount >= 1 && (
@@ -582,8 +576,7 @@ export function AnimatedPenguin({ size = 160, useDynamicViewBox = true, useStati
 
         {/* Left wing - Animated */}
         <AnimatedG
-          transform={`translate(209.5, 168.023)`}
-          origin="0,0"
+          transform={[{ translateX: 209.5 }, { translateY: 168.023 }]}
         >
           <AnimatedEllipse
             cx="0"
@@ -600,8 +593,7 @@ export function AnimatedPenguin({ size = 160, useDynamicViewBox = true, useStati
 
         {/* Right wing - Animated */}
         <AnimatedG
-          transform={`translate(53.5, 168.5)`}
-          origin="0,0"
+          transform={[{ translateX: 53.5 }, { translateY: 168.5 }]}
         >
           <AnimatedEllipse
             cx="0"
@@ -635,8 +627,7 @@ export function AnimatedPenguin({ size = 160, useDynamicViewBox = true, useStati
 
         {/* Feet - Animated */}
         <AnimatedG
-          transform={`translate(107.5, 221.5)`}
-          origin="0,0"
+          transform={[{ translateX: 107.5 }, { translateY: 221.5 }]}
         >
           <AnimatedEllipse
             cx="0"
@@ -652,8 +643,7 @@ export function AnimatedPenguin({ size = 160, useDynamicViewBox = true, useStati
         </AnimatedG>
         
         <AnimatedG
-          transform={`translate(157.5, 221.5)`}
-          origin="0,0"
+          transform={[{ translateX: 157.5 }, { translateY: 221.5 }]}
         >
           <AnimatedEllipse
             cx="0"
