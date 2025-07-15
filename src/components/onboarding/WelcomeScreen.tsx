@@ -13,23 +13,24 @@ import {
   View,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useBackgroundGradient, useTheme } from '../../providers/ThemeProvider';
 import type {
   ResponsiveConfiguration,
-  ScreenDimensions,
   ResponsiveStyles,
+  ScreenDimensions,
   WelcomeScreenLayout,
 } from '../../types';
+import { detectPerformanceTier, getPerformanceConfig } from '../../utils/performanceTiers';
 import {
+  getButtonDimensions,
+  getLandscapeLayoutConfig,
   getResponsiveConfig,
   getResponsiveFontSize,
+  getResponsiveSize,
   getResponsiveSpacing,
   getSafeAreaSpacing,
-  getButtonDimensions,
   getThumbZoneSpacing,
-  getResponsiveSize,
-  getLandscapeLayoutConfig,
 } from '../../utils/responsive';
-import { detectPerformanceTier, getPerformanceConfig } from '../../utils/performanceTiers';
 import { Button } from '../ui/Button';
 import { AnimatedPenguin } from './AnimatedPenguin';
 import { SnowEffect } from './SnowEffect';
@@ -131,6 +132,12 @@ export function WelcomeScreen({ onGetStarted, responsiveConfig }: WelcomeScreenP
   const slideAnim = useRef(new Animated.Value(ANIMATION_CONFIG.INITIAL_SLIDE_OFFSET)).current;
   
   const [appState, setAppState] = useState<AppStateStatus>(AppState.currentState);
+  const backgroundGradient = useBackgroundGradient();
+
+  const { setTheme } = useTheme(); 
+  const handleThemeChange = () => {
+    setTheme('energetic'); // Changes to green theme 
+  };
   
   // Get comprehensive responsive configuration
   const config = useMemo(() => {
@@ -211,37 +218,12 @@ export function WelcomeScreen({ onGetStarted, responsiveConfig }: WelcomeScreenP
     <View style={styles.container}>
       {/* Optimized single background gradient */}
       <LinearGradient
-        colors={[
-          '#64748B', 
-          '#7C3AED', 
-          '#312E81', 
-          '#1E1B4B'
-        ]}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}
+        colors={backgroundGradient.colors as any}
+        start={backgroundGradient.start}
+        end={backgroundGradient.end}
         style={StyleSheet.absoluteFillObject}
       />
 
-      {/* Responsive decorative circles */}
-      <View style={[
-        styles.decorativeCircle,
-        {
-          width: config.styles.dimensions.decorativeCircles.top.width,
-          height: config.styles.dimensions.decorativeCircles.top.height,
-          top: config.styles.dimensions.decorativeCircles.top.top,
-          right: config.styles.dimensions.decorativeCircles.top.right,
-        }
-      ]} />
-      <View style={[
-        styles.decorativeCircle,
-        styles.bottomCircleColor,
-        {
-          width: config.styles.dimensions.decorativeCircles.bottom.width,
-          height: config.styles.dimensions.decorativeCircles.bottom.height,
-          bottom: config.styles.dimensions.decorativeCircles.bottom.bottom,
-          left: config.styles.dimensions.decorativeCircles.bottom.left,
-        }
-      ]} />
       
       {/* Snow effect - adaptive intensity */}
       <SnowEffect 
@@ -309,7 +291,7 @@ export function WelcomeScreen({ onGetStarted, responsiveConfig }: WelcomeScreenP
                     lineHeight: config.styles.fontSize.subtitle * ANIMATION_CONFIG.SUBTITLE_LINE_HEIGHT_MULTIPLIER,
                   }
                 ]}>
-                  Build habits. Crush goals.{'\n'}Stay motivated.
+                  Build. Achieve. Sustain.{'\n'}Repeat.
                 </Text>
               </View>
 
@@ -389,7 +371,7 @@ export function WelcomeScreen({ onGetStarted, responsiveConfig }: WelcomeScreenP
                     lineHeight: config.styles.fontSize.subtitle * ANIMATION_CONFIG.SUBTITLE_LINE_HEIGHT_MULTIPLIER,
                   }
                 ]}>
-                  Build habits. Crush goals.{'\n'}Stay motivated.
+                 Build. Achieve. Sustain.{'\n'}Repeat.
                 </Text>
               </View>
             </View>
@@ -487,14 +469,6 @@ const styles = StyleSheet.create({
     fontWeight: '300',
     color: 'rgba(255, 255, 255, 0.7)',
     textAlign: 'center',
-  },
-  decorativeCircle: {
-    position: 'absolute',
-    borderRadius: 1000, // Large value to ensure perfect circle regardless of size
-    backgroundColor: 'rgba(147, 51, 234, 0.05)',
-  },
-  bottomCircleColor: {
-    backgroundColor: 'rgba(219, 39, 119, 0.05)',
   },
   // Landscape-specific styles
   penguinColumn: {

@@ -19,6 +19,80 @@ export const THEME = {
     text: '#000000',
     textSecondary: '#8E8E93',
   },
+  backgrounds: {
+    gradients: {
+      calm: {
+        colors: ['#F0F9FF', '#7DD3FC', '#0284C7', '#0C4A6E'],
+        start: { x: 0, y: 0 },
+        end: { x: 1, y: 1 },
+        description: 'Calming blue gradient for focus and productivity',
+      },
+      energetic: {
+        colors: ['#FEF3C7', '#F59E0B', '#DC2626', '#7F1D1D'],
+        start: { x: 0, y: 0 },
+        end: { x: 1, y: 1 },
+        description: 'Energetic sunset gradient for motivation and action',
+      },
+      focus: {
+        colors: ['#F8FAFC', '#E2E8F0', '#64748B', '#334155'],
+        start: { x: 0, y: 0 },
+        end: { x: 1, y: 1 },
+        description: 'Neutral gray gradient for deep focus sessions',
+      },
+      wellness: {
+        colors: ['#F7FDF7', '#BBF7D0', '#059669', '#064E3B'],
+        start: { x: 0, y: 0 },
+        end: { x: 1, y: 1 },
+        description: 'Sage green gradient for mental wellness and balance',
+      },
+      night: {
+        colors: ['#0F172A', '#1E293B', '#334155', '#475569'],
+        start: { x: 0, y: 0 },
+        end: { x: 1, y: 1 },
+        description: 'Dark gradient for evening and night sessions',
+      },
+      minimalist: {
+        colors: ['#FFFFFF', '#F8FAFC', '#E2E8F0', '#CBD5E1'],
+        start: { x: 0, y: 0 },
+        end: { x: 1, y: 1 },
+        description: 'Clean minimalist gradient for distraction-free focus',
+      },
+      'nature-inspired': {
+        colors: ['#F0FDF4', '#86EFAC', '#16A34A', '#14532D'],
+        start: { x: 0, y: 0 },
+        end: { x: 1, y: 1 },
+        description: 'Natural earth tones for grounding and connection',
+      },
+      corporate: {
+        colors: ['#F8FAFC', '#E1E7EF', '#3B82F6', '#1E3A8A'],
+        start: { x: 0, y: 0 },
+        end: { x: 1, y: 1 },
+        description: 'Professional blue gradient for business environments',
+      },
+      retro: {
+        colors: ['#FEF3C7', '#F59E0B', '#D97706', '#92400E'],
+        start: { x: 0, y: 0 },
+        end: { x: 1, y: 1 },
+        description: 'Vintage warm gradient for nostalgic productivity',
+      },
+      futuristic: {
+        colors: ['#0F0F23', '#1E1B4B', '#6366F1', '#06B6D4'],
+        start: { x: 0, y: 0 },
+        end: { x: 1, y: 1 },
+        description: 'Cyberpunk neon gradient for innovative thinking',
+      },
+    },
+    solid: {
+      light: '#F8FAFC',
+      dark: '#0F172A',
+      neutral: '#F1F5F9',
+    },
+    overlays: {
+      light: 'rgba(255, 255, 255, 0.1)',
+      dark: 'rgba(0, 0, 0, 0.1)',
+      accent: 'rgba(124, 58, 237, 0.05)',
+    },
+  },
   spacing: {
     xs: 4,
     sm: 8,

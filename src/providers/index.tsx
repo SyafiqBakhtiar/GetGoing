@@ -1,15 +1,18 @@
 import { PropsWithChildren } from 'react';
 import { QueryProvider } from './QueryProvider';
 import { OnboardingProvider } from '../contexts/OnboardingContext';
+import { ThemeProvider } from './ThemeProvider';
 
 export function AppProviders({ children }: PropsWithChildren) {
   return (
     <QueryProvider>
-      <OnboardingProvider>
-        {children}
-      </OnboardingProvider>
+      <ThemeProvider>
+        <OnboardingProvider>
+          {children}
+        </OnboardingProvider>
+      </ThemeProvider>
     </QueryProvider>
   );
 }
 
-export { QueryProvider };
+export { QueryProvider, ThemeProvider };
