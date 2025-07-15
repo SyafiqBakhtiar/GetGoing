@@ -11,6 +11,7 @@ import Svg, {
   Stop
 } from 'react-native-svg';
 import { detectPerformanceTier } from '../../utils/performanceTiers';
+import { getResponsiveConfig, getResponsiveViewBox } from '../../utils/responsive';
 
 // Create animated versions of SVG components
 const AnimatedG = Animated.createAnimatedComponent(G);
@@ -20,9 +21,11 @@ const AnimatedCircle = Animated.createAnimatedComponent(Circle);
 
 interface AnimatedPenguinProps {
   size?: number;
+  useDynamicViewBox?: boolean; // Optional prop to disable dynamic viewBox
+  useStaticViewBox?: boolean; // Force static viewBox (overrides useDynamicViewBox)
 }
 
-export function AnimatedPenguin({ size = 160 }: AnimatedPenguinProps) {
+export function AnimatedPenguin({ size = 160, useDynamicViewBox = true, useStaticViewBox = false }: AnimatedPenguinProps) {
   const waddleAnim = useRef(new Animated.Value(0)).current;
   const bobAnim = useRef(new Animated.Value(0)).current;
   const wingLeftAnim = useRef(new Animated.Value(0)).current;
@@ -39,6 +42,21 @@ export function AnimatedPenguin({ size = 160 }: AnimatedPenguinProps) {
   const [appState, setAppState] = useState<AppStateStatus>(AppState.currentState);
   const animationsRef = useRef<Animated.CompositeAnimation[]>([]);
   
+  // Responsive configuration for landscape optimization
+  const responsiveConfig = useMemo(() => getResponsiveConfig(), []);
+  const isLandscape = responsiveConfig.isLandscape;
+  
+  // Auto-detect mobile and default to static viewBox for mobile phones
+  const shouldUseStaticViewBox = useMemo(() => {
+    if (useStaticViewBox) return true;
+    
+    // Auto-enable static viewBox for mobile phones with very tall aspect ratios
+    const isMobilePhone = responsiveConfig.deviceType === 'phone' && 
+                         responsiveConfig.aspectRatio < 0.7;
+    
+    return isMobilePhone;
+  }, [useStaticViewBox, responsiveConfig]);
+  
   // Performance tier detection for adaptive sparkle count
   const performanceTier = useMemo(() => detectPerformanceTier(), []);
   const sparkleCount = useMemo(() => {
@@ -49,6 +67,53 @@ export function AnimatedPenguin({ size = 160 }: AnimatedPenguinProps) {
       default: return 2;
     }
   }, [performanceTier]);
+  
+  // Landscape-specific size adjustments
+  const adjustedSize = useMemo(() => {
+    if (isLandscape) {
+      return size * 0.8; // Reduce size in landscape for better fit
+    }
+    return size;
+  }, [size, isLandscape]);
+  
+  // Ice floor scaling for landscape
+  const iceFloorScale = useMemo(() => {
+    if (isLandscape) {
+      return { width: 1.6, height: 1.0 }; // Wider but same height in landscape
+    }
+    return { width: 1.8, height: 1.2 }; // Original proportions
+  }, [isLandscape]);
+  
+  // Dynamic viewBox calculations with caching and fallback
+  const iceFloorViewBox = useMemo(() => {
+    if (shouldUseStaticViewBox || !useDynamicViewBox) {
+      if (__DEV__) {
+        console.log('AnimatedPenguin: Using static viewBox for ice floor', {
+          shouldUseStaticViewBox,
+          useDynamicViewBox,
+          deviceType: responsiveConfig.deviceType,
+          aspectRatio: responsiveConfig.aspectRatio
+        });
+      }
+      return '0 0 500 320'; // Force static viewBox or fallback
+    }
+    return getResponsiveViewBox('0 0 500 320', responsiveConfig);
+  }, [responsiveConfig, useDynamicViewBox, shouldUseStaticViewBox]);
+  
+  const penguinViewBox = useMemo(() => {
+    if (shouldUseStaticViewBox || !useDynamicViewBox) {
+      if (__DEV__) {
+        console.log('AnimatedPenguin: Using static viewBox for penguin', {
+          shouldUseStaticViewBox,
+          useDynamicViewBox,
+          deviceType: responsiveConfig.deviceType,
+          aspectRatio: responsiveConfig.aspectRatio
+        });
+      }
+      return '0 0 272 261'; // Force static viewBox or fallback
+    }
+    return getResponsiveViewBox('0 0 272 261', responsiveConfig);
+  }, [responsiveConfig, useDynamicViewBox, shouldUseStaticViewBox]);
 
   // Handle app state changes for performance optimization
   useEffect(() => {
@@ -282,9 +347,9 @@ export function AnimatedPenguin({ size = 160 }: AnimatedPenguinProps) {
     <>
      {/* Static ice floor - not animated */}
      <Svg
-     width={size * 1.8}
-     height={size * 1.2}
-     viewBox="0 0 500 320"
+     width={adjustedSize * iceFloorScale.width}
+     height={adjustedSize * iceFloorScale.height}
+     viewBox={iceFloorViewBox}
      style={{
        position: 'absolute',
        zIndex: -1,
@@ -464,9 +529,9 @@ export function AnimatedPenguin({ size = 160 }: AnimatedPenguinProps) {
       }}
     >
       <Svg
-        width={size}
-        height={size * 0.97} // Maintain aspect ratio from original (155/160)
-        viewBox="0 0 272 261"
+        width={adjustedSize}
+        height={adjustedSize * 0.97} // Maintain aspect ratio from original (155/160)
+        viewBox={penguinViewBox}
         style={{
           shadowColor: '#000',
           shadowOffset: { width: 0, height: 10 },

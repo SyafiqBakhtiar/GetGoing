@@ -27,6 +27,7 @@ import {
   getButtonDimensions,
   getThumbZoneSpacing,
   getResponsiveSize,
+  getLandscapeLayoutConfig,
 } from '../../utils/responsive';
 import { detectPerformanceTier, getPerformanceConfig } from '../../utils/performanceTiers';
 import { Button } from '../ui/Button';
@@ -59,7 +60,8 @@ const createResponsiveConfiguration = (): ResponsiveConfiguration => {
     deviceType: responsiveConfig.deviceType,
     isSmallPhone: responsiveConfig.isSmallPhone,
     isLargeScreen: responsiveConfig.isLargeScreen,
-    aspectRatio: width / height,
+    isLandscape: responsiveConfig.isLandscape,
+    aspectRatio: responsiveConfig.aspectRatio,
   };
 
   const styles: ResponsiveStyles = {
@@ -95,6 +97,7 @@ const createResponsiveConfiguration = (): ResponsiveConfiguration => {
   };
 
   const { buttonContainerHeight, bottomOffset } = getThumbZoneSpacing(insets, responsiveConfig);
+  const landscapeConfig = getLandscapeLayoutConfig(responsiveConfig);
   
   const layout: WelcomeScreenLayout = {
     centeredContent: {
@@ -110,6 +113,7 @@ const createResponsiveConfiguration = (): ResponsiveConfiguration => {
       paddingBottom: styles.spacing.vertical,
       paddingHorizontal: styles.spacing.horizontal,
     },
+    landscape: landscapeConfig,
   };
 
   return { dimensions, styles, layout };
@@ -255,81 +259,171 @@ export function WelcomeScreen({ onGetStarted, responsiveConfig }: WelcomeScreenP
             paddingHorizontal: config.layout.safeArea.paddingHorizontal,
             opacity: fadeAnim,
             transform: [{ translateY: slideAnim }],
+            flexDirection: config.layout.landscape?.useHorizontalLayout ? 'row' : 'column',
           },
         ]}
       >
-        {/* Centered content: Penguin + Branding */}
-        <View style={[
-          styles.centeredContent,
-          {
-            flex: config.layout.centeredContent.flex,
-            marginTop: config.layout.centeredContent.marginTop,
-            marginBottom: config.layout.centeredContent.marginBottom,
-          }
-        ]}>
-          {/* Penguin */}
-          <View style={[
-            styles.penguinContainer,
-            { marginBottom: config.styles.spacing.component * SPACING_MULTIPLIERS.PENGUIN_BOTTOM_MARGIN }
-          ]}>
-            <AnimatedPenguin size={config.styles.dimensions.penguin} />
-          </View>
-
-          {/* App branding */}
-          <View style={styles.brandingContainer}>
-            <Text style={[
-              styles.title,
+        {config.layout.landscape?.useHorizontalLayout ? (
+          // Landscape horizontal layout
+          <>
+            {/* Penguin Column */}
+            <View style={[
+              styles.penguinColumn,
               {
-                fontSize: config.styles.fontSize.title,
-                marginBottom: config.styles.spacing.component,
-              }
-            ]}>GetGoing</Text>
-            <Text style={[
-              styles.subtitle,
-              {
-                fontSize: config.styles.fontSize.subtitle,
-                lineHeight: config.styles.fontSize.subtitle * ANIMATION_CONFIG.SUBTITLE_LINE_HEIGHT_MULTIPLIER,
+                width: config.layout.landscape.penguinColumnWidth as DimensionValue,
+                marginRight: config.layout.landscape.horizontalSpacing,
               }
             ]}>
-              Build habits. Crush goals.{'\n'}Stay motivated.
-            </Text>
-          </View>
-        </View>
+              <View style={[
+                styles.penguinContainer,
+                styles.penguinContainerLandscape,
+              ]}>
+                <AnimatedPenguin size={config.styles.dimensions.penguin} />
+              </View>
+            </View>
 
-        {/* Get Started button - Optimally positioned */}
-        <View style={[
-          styles.buttonContainer,
-          {
-            minHeight: config.layout.buttonContainer.minHeight,
-            marginBottom: config.layout.buttonContainer.marginBottom,
-          }
-        ]}>
-          <Button
-            title="Get Started"
-            onPress={handleGetStarted}
-            variant="primary"
-            size="large"
-            style={[
-              styles.getStartedButton,
+            {/* Content Column */}
+            <View style={[
+              styles.contentColumn,
               {
-                width: config.styles.dimensions.button.width as DimensionValue,
-                maxWidth: config.styles.dimensions.button.maxWidth,
-                minHeight: config.styles.dimensions.button.minHeight,
+                width: config.layout.landscape.contentColumnWidth as DimensionValue,
+                flex: 1,
               }
-            ]}
-            textStyle={[
-              styles.buttonText,
-              { fontSize: config.styles.fontSize.button }
-            ]}
-          />
-          <Text style={[
-            styles.trialNote,
-            {
-              fontSize: config.styles.fontSize.caption,
-              marginTop: config.styles.spacing.component,
-            }
-          ]}>Free trial • No signup needed</Text>
-        </View>
+            ]}>
+              {/* App branding */}
+              <View style={[styles.brandingContainer, styles.brandingContainerLandscape]}>
+                <Text style={[
+                  styles.title,
+                  {
+                    fontSize: config.styles.fontSize.title,
+                    marginBottom: config.styles.spacing.component,
+                  }
+                ]}>GetGoing</Text>
+                <Text style={[
+                  styles.subtitle,
+                  {
+                    fontSize: config.styles.fontSize.subtitle,
+                    lineHeight: config.styles.fontSize.subtitle * ANIMATION_CONFIG.SUBTITLE_LINE_HEIGHT_MULTIPLIER,
+                  }
+                ]}>
+                  Build habits. Crush goals.{'\n'}Stay motivated.
+                </Text>
+              </View>
+
+              {/* Get Started button */}
+              <View style={[
+                styles.buttonContainer,
+                styles.buttonContainerLandscape,
+                {
+                  minHeight: config.layout.buttonContainer.minHeight,
+                  marginBottom: config.layout.buttonContainer.marginBottom,
+                }
+              ]}>
+                <Button
+                  title="Get Started"
+                  onPress={handleGetStarted}
+                  variant="primary"
+                  size="large"
+                  style={[
+                    styles.getStartedButton,
+                    {
+                      width: config.styles.dimensions.button.width as DimensionValue,
+                      maxWidth: config.styles.dimensions.button.maxWidth,
+                      minHeight: config.styles.dimensions.button.minHeight,
+                    }
+                  ]}
+                  textStyle={[
+                    styles.buttonText,
+                    { fontSize: config.styles.fontSize.button }
+                  ]}
+                />
+                <Text style={[
+                  styles.trialNote,
+                  {
+                    fontSize: config.styles.fontSize.caption,
+                    marginTop: config.styles.spacing.component,
+                  }
+                ]}>Free trial • No signup needed</Text>
+              </View>
+            </View>
+          </>
+        ) : (
+          // Portrait vertical layout
+          <>
+            {/* Centered content: Penguin + Branding */}
+            <View style={[
+              styles.centeredContent,
+              {
+                flex: config.layout.centeredContent.flex,
+                marginTop: config.layout.centeredContent.marginTop,
+                marginBottom: config.layout.centeredContent.marginBottom,
+              }
+            ]}>
+              {/* Penguin */}
+              <View style={[
+                styles.penguinContainer,
+                { marginBottom: config.styles.spacing.component * SPACING_MULTIPLIERS.PENGUIN_BOTTOM_MARGIN }
+              ]}>
+                <AnimatedPenguin size={config.styles.dimensions.penguin} />
+              </View>
+
+              {/* App branding */}
+              <View style={styles.brandingContainer}>
+                <Text style={[
+                  styles.title,
+                  {
+                    fontSize: config.styles.fontSize.title,
+                    marginBottom: config.styles.spacing.component,
+                  }
+                ]}>GetGoing</Text>
+                <Text style={[
+                  styles.subtitle,
+                  {
+                    fontSize: config.styles.fontSize.subtitle,
+                    lineHeight: config.styles.fontSize.subtitle * ANIMATION_CONFIG.SUBTITLE_LINE_HEIGHT_MULTIPLIER,
+                  }
+                ]}>
+                  Build habits. Crush goals.{'\n'}Stay motivated.
+                </Text>
+              </View>
+            </View>
+
+            {/* Get Started button - Optimally positioned */}
+            <View style={[
+              styles.buttonContainer,
+              {
+                minHeight: config.layout.buttonContainer.minHeight,
+                marginBottom: config.layout.buttonContainer.marginBottom,
+              }
+            ]}>
+              <Button
+                title="Get Started"
+                onPress={handleGetStarted}
+                variant="primary"
+                size="large"
+                style={[
+                  styles.getStartedButton,
+                  {
+                    width: config.styles.dimensions.button.width as DimensionValue,
+                    maxWidth: config.styles.dimensions.button.maxWidth,
+                    minHeight: config.styles.dimensions.button.minHeight,
+                  }
+                ]}
+                textStyle={[
+                  styles.buttonText,
+                  { fontSize: config.styles.fontSize.button }
+                ]}
+              />
+              <Text style={[
+                styles.trialNote,
+                {
+                  fontSize: config.styles.fontSize.caption,
+                  marginTop: config.styles.spacing.component,
+                }
+              ]}>Free trial • No signup needed</Text>
+            </View>
+          </>
+        )}
       </Animated.View>
     </View>
   );
@@ -395,5 +489,25 @@ const styles = StyleSheet.create({
   },
   bottomCircleColor: {
     backgroundColor: 'rgba(219, 39, 119, 0.05)',
+  },
+  // Landscape-specific styles
+  penguinColumn: {
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  contentColumn: {
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  penguinContainerLandscape: {
+    marginBottom: 0,
+  },
+  brandingContainerLandscape: {
+    flex: 1,
+    justifyContent: 'center',
+    marginBottom: 20,
+  },
+  buttonContainerLandscape: {
+    justifyContent: 'flex-end',
   },
 });

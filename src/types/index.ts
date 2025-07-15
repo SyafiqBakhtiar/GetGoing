@@ -143,6 +143,7 @@ export interface ScreenDimensions {
   deviceType: 'phone' | 'tablet' | 'desktop';
   isSmallPhone: boolean;
   isLargeScreen: boolean;
+  isLandscape: boolean;
   aspectRatio: number;
 }
 
@@ -187,6 +188,12 @@ export interface WelcomeScreenLayout {
     paddingBottom: number;
     paddingHorizontal: number;
   };
+  landscape?: {
+    useHorizontalLayout: boolean;
+    penguinColumnWidth: string;
+    contentColumnWidth: string;
+    horizontalSpacing: number;
+  };
 }
 
 export interface ResponsiveConfiguration {
@@ -209,5 +216,32 @@ export interface PaginatedResponse<T> {
     limit: number;
     total: number;
     pages: number;
+  };
+}
+
+// Dynamic ViewBox Configuration types
+export interface ViewBoxDimensions {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}
+
+export interface ViewBoxAdjustments {
+  widthMultiplier: number;
+  heightMultiplier: number;
+}
+
+export interface ViewBoxConfig {
+  baseViewBox: ViewBoxDimensions;
+  aspectRatioThresholds: {
+    ultraWide: number;
+    wide: number;
+    normal: number;
+    tall: number;
+  };
+  adjustments: {
+    ultraWide: ViewBoxAdjustments;
+    tall: ViewBoxAdjustments;
   };
 }
