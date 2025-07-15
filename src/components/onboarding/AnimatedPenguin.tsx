@@ -7,8 +7,13 @@ import Svg, {
   LinearGradient,
   Path,
   RadialGradient,
-  Stop
+  Stop,
+  G
 } from 'react-native-svg';
+
+// Create animated versions of SVG components
+const AnimatedG = Animated.createAnimatedComponent(G);
+const AnimatedEllipse = Animated.createAnimatedComponent(Ellipse);
 
 interface AnimatedPenguinProps {
   size?: number;
@@ -42,98 +47,57 @@ export function AnimatedPenguin({ size = 160 }: AnimatedPenguinProps) {
     if (shouldAnimate) {
       // Start all animations when app is active
       const waddleAnimation = Animated.loop(
-        Animated.sequence([
-          Animated.timing(waddleAnim, {
-            toValue: 1,
-            duration: 1500,
-            easing: Easing.inOut(Easing.sin),
-            useNativeDriver: true,
-          }),
-          Animated.timing(waddleAnim, {
-            toValue: 0,
-            duration: 1500,
-            easing: Easing.inOut(Easing.sin),
-            useNativeDriver: true,
-          }),
-        ])
+        Animated.timing(waddleAnim, {
+          toValue: 1,
+          duration: 1500,
+          easing: Easing.inOut(Easing.ease),
+          useNativeDriver: true,
+        })
       );
 
       const bobAnimation = Animated.loop(
         Animated.timing(bobAnim, {
           toValue: 1,
           duration: 1500,
-          easing: Easing.inOut(Easing.sin),
+          easing: Easing.inOut(Easing.ease),
           useNativeDriver: true,
         })
       );
 
       const wingLeftAnimation = Animated.loop(
-        Animated.sequence([
-          Animated.timing(wingLeftAnim, {
-            toValue: 1,
-            duration: 750,
-            easing: Easing.inOut(Easing.sin),
-            useNativeDriver: true,
-          }),
-          Animated.timing(wingLeftAnim, {
-            toValue: 0,
-            duration: 750,
-            easing: Easing.inOut(Easing.sin),
-            useNativeDriver: true,
-          }),
-        ])
+        Animated.timing(wingLeftAnim, {
+          toValue: 1,
+          duration: 1500,
+          easing: Easing.inOut(Easing.ease),
+          useNativeDriver: true,
+        })
       );
 
       const wingRightAnimation = Animated.loop(
-        Animated.sequence([
-          Animated.timing(wingRightAnim, {
-            toValue: 1,
-            duration: 750,
-            easing: Easing.inOut(Easing.sin),
-            useNativeDriver: true,
-          }),
-          Animated.timing(wingRightAnim, {
-            toValue: 0,
-            duration: 750,
-            easing: Easing.inOut(Easing.sin),
-            useNativeDriver: true,
-          }),
-        ])
+        Animated.timing(wingRightAnim, {
+          toValue: 1,
+          duration: 1500,
+          easing: Easing.inOut(Easing.ease),
+          useNativeDriver: true,
+        })
       );
 
       const footLeftAnimation = Animated.loop(
-        Animated.sequence([
-          Animated.timing(footLeftAnim, {
-            toValue: 1,
-            duration: 375,
-            easing: Easing.inOut(Easing.sin),
-            useNativeDriver: true,
-          }),
-          Animated.timing(footLeftAnim, {
-            toValue: 0,
-            duration: 1125,
-            easing: Easing.inOut(Easing.sin),
-            useNativeDriver: true,
-          }),
-        ])
+        Animated.timing(footLeftAnim, {
+          toValue: 1,
+          duration: 1500,
+          easing: Easing.inOut(Easing.ease),
+          useNativeDriver: true,
+        })
       );
 
       const footRightAnimation = Animated.loop(
-        Animated.sequence([
-          Animated.delay(750),
-          Animated.timing(footRightAnim, {
-            toValue: 1,
-            duration: 375,
-            easing: Easing.inOut(Easing.sin),
-            useNativeDriver: true,
-          }),
-          Animated.timing(footRightAnim, {
-            toValue: 0,
-            duration: 375,
-            easing: Easing.inOut(Easing.sin),
-            useNativeDriver: true,
-          }),
-        ])
+        Animated.timing(footRightAnim, {
+          toValue: 1,
+          duration: 1500,
+          easing: Easing.inOut(Easing.ease),
+          useNativeDriver: true,
+        })
       );
 
       // Store animations for cleanup
@@ -180,46 +144,46 @@ export function AnimatedPenguin({ size = 160 }: AnimatedPenguinProps) {
     outputRange: [0, -2, 0],
   });
 
-  // Wing animation interpolations
+  // Wing animation interpolations - match web keyframes
   const wingLeftRotate = wingLeftAnim.interpolate({
-    inputRange: [0, 1],
-    outputRange: ['-135deg', '-145deg'],
+    inputRange: [0, 0.5, 1],
+    outputRange: ['-135deg', '-145deg', '-135deg'],
   });
 
-  const wingLeftScale = wingLeftAnim.interpolate({
-    inputRange: [0, 1],
-    outputRange: [1, 0.8],
+  const wingLeftScaleY = wingLeftAnim.interpolate({
+    inputRange: [0, 0.5, 1],
+    outputRange: [1, 0.8, 1],
   });
 
   const wingRightRotate = wingRightAnim.interpolate({
-    inputRange: [0, 1],
-    outputRange: ['135deg', '145deg'],
+    inputRange: [0, 0.5, 1],
+    outputRange: ['135deg', '145deg', '135deg'],
   });
 
-  const wingRightScale = wingRightAnim.interpolate({
-    inputRange: [0, 1],
-    outputRange: [1, 0.8],
+  const wingRightScaleY = wingRightAnim.interpolate({
+    inputRange: [0, 0.5, 1],
+    outputRange: [1, 0.8, 1],
   });
 
-  // Foot animation interpolations
+  // Foot animation interpolations - match web alternating pattern
   const footLeftTranslateY = footLeftAnim.interpolate({
-    inputRange: [0, 1],
-    outputRange: [0, -3],
+    inputRange: [0, 0.25, 0.5, 1],
+    outputRange: [0, -3, 0, 0],
   });
 
   const footLeftScaleX = footLeftAnim.interpolate({
-    inputRange: [0, 1],
-    outputRange: [1, 1.2],
+    inputRange: [0, 0.25, 0.5, 1],
+    outputRange: [1, 1.2, 1, 1],
   });
 
   const footRightTranslateY = footRightAnim.interpolate({
-    inputRange: [0, 1],
-    outputRange: [0, -3],
+    inputRange: [0, 0.5, 0.75, 1],
+    outputRange: [0, 0, -3, 0],
   });
 
   const footRightScaleX = footRightAnim.interpolate({
-    inputRange: [0, 1],
-    outputRange: [1, 1.2],
+    inputRange: [0, 0.5, 0.75, 1],
+    outputRange: [1, 1, 1.2, 1],
   });
 
   return (
@@ -318,25 +282,41 @@ export function AnimatedPenguin({ size = 160 }: AnimatedPenguinProps) {
         {/* White penguin body */}
         <Circle cx="131.5" cy="158.5" r="49.5" fill="white" />
 
-        {/* Left wing */}
-        <Ellipse
-          cx="209.5"
-          cy="168.023"
-          rx="28.6216"
-          ry="11.6835"
-          fill="#3730A3"
-          transform="rotate(-135 209.5 168.023)"
-        />
+        {/* Left wing - Animated */}
+        <AnimatedG
+          transform={`translate(209.5, 168.023)`}
+          origin="0,0"
+        >
+          <AnimatedEllipse
+            cx="0"
+            cy="0"
+            rx="28.6216"
+            ry="11.6835"
+            fill="#3730A3"
+            transform={[
+              { rotate: wingLeftRotate },
+              { scaleY: wingLeftScaleY },
+            ]}
+          />
+        </AnimatedG>
 
-        {/* Right wing */}
-        <Ellipse
-          cx="53.5"
-          cy="168.5"
-          rx="28.6216"
-          ry="11.6835"
-          fill="#3730A3"
-          transform="rotate(135 53.5 168.5)"
-        />
+        {/* Right wing - Animated */}
+        <AnimatedG
+          transform={`translate(53.5, 168.5)`}
+          origin="0,0"
+        >
+          <AnimatedEllipse
+            cx="0"
+            cy="0"
+            rx="28.6216"
+            ry="11.6835"
+            fill="#3730A3"
+            transform={[
+              { rotate: wingRightRotate },
+              { scaleY: wingRightScaleY },
+            ]}
+          />
+        </AnimatedG>
 
         {/* Head background */}
         <Ellipse 
@@ -355,9 +335,40 @@ export function AnimatedPenguin({ size = 160 }: AnimatedPenguinProps) {
           fill="url(#beakGradient)"
         />
 
-        {/* Feet */}
-        <Ellipse cx="107.5" cy="221.5" rx="17.5" ry="7.5" fill="#FB923C" />
-        <Ellipse cx="157.5" cy="221.5" rx="17.5" ry="7.5" fill="#FB923C" />
+        {/* Feet - Animated */}
+        <AnimatedG
+          transform={`translate(107.5, 221.5)`}
+          origin="0,0"
+        >
+          <AnimatedEllipse
+            cx="0"
+            cy="0"
+            rx="17.5"
+            ry="7.5"
+            fill="#FB923C"
+            transform={[
+              { translateY: footLeftTranslateY },
+              { scaleX: footLeftScaleX },
+            ]}
+          />
+        </AnimatedG>
+        
+        <AnimatedG
+          transform={`translate(157.5, 221.5)`}
+          origin="0,0"
+        >
+          <AnimatedEllipse
+            cx="0"
+            cy="0"
+            rx="17.5"
+            ry="7.5"
+            fill="#FB923C"
+            transform={[
+              { translateY: footRightTranslateY },
+              { scaleX: footRightScaleX },
+            ]}
+          />
+        </AnimatedG>
 
         {/* Eyes */}
         <Ellipse cx="95" cy="90" rx="30" ry="35" fill="white" />
