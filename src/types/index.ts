@@ -135,6 +135,66 @@ export type RootStackParamList = {
   Onboarding: undefined;
 };
 
+// Responsive Design types
+export interface ScreenDimensions {
+  width: number;
+  height: number;
+  scale: number;
+  deviceType: 'phone' | 'tablet' | 'desktop';
+  isSmallPhone: boolean;
+  isLargeScreen: boolean;
+  aspectRatio: number;
+}
+
+export interface ResponsiveStyles {
+  fontSize: {
+    title: number;
+    subtitle: number;
+    button: number;
+    caption: number;
+  };
+  spacing: {
+    vertical: number;
+    horizontal: number;
+    component: number;
+  };
+  dimensions: {
+    penguin: number;
+    button: {
+      width: string | number;
+      maxWidth: number;
+      minHeight: number;
+    };
+    decorativeCircles: {
+      top: { width: number; height: number; top: number; right: number };
+      bottom: { width: number; height: number; bottom: number; left: number };
+    };
+  };
+}
+
+export interface WelcomeScreenLayout {
+  centeredContent: {
+    flex: number;
+    marginTop?: number;
+    marginBottom?: number;
+  };
+  buttonContainer: {
+    minHeight: number;
+    marginBottom: number;
+  };
+  safeArea: {
+    paddingTop: number;
+    paddingBottom: number;
+    paddingHorizontal: number;
+  };
+}
+
+export interface ResponsiveConfiguration {
+  dimensions: ScreenDimensions;
+  styles: ResponsiveStyles;
+  layout: WelcomeScreenLayout;
+}
+
 // API Response types
 export interface ApiResponse<T> {
   data: T;
