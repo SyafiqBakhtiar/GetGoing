@@ -146,9 +146,11 @@ src/
 
 ### Onboarding (< 3 minutes)
 1. Welcome screen with feature carousel
-2. Choose starting point: Goal, Habit, or Task
-3. AI-assisted setup wizard
-4. Virtual pet introduction
+2. Personalize Journey
+   2.1  - "What do you want to achieve with GetGoing?" Build habits | Reach a life goal | Manage tasks better
+   2.2 - Translate Their Choice into a Default Path 
+3. Virtual pet introduction
+4. Core Feature Carousel 
 5. Navigation tour
 
 ### Daily Usage
