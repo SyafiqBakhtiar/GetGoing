@@ -8,6 +8,7 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import * as Haptics from 'expo-haptics';
+import { Typography } from '@/src/utils/typography';
 
 export interface ButtonProps {
   title: string;
@@ -41,9 +42,8 @@ export function Button({
   ];
 
   const titleStyle = [
-    styles.text,
+    Typography.button,
     styles[`${variant}Text`],
-    styles[`${size}Text`],
     disabled && styles.disabledText,
     textStyle,
   ];
@@ -84,10 +84,6 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.2,
     shadowRadius: 8,
     elevation: 8,
-  },
-  text: {
-    fontWeight: '600',
-    textAlign: 'center',
   },
   
   // Variants
@@ -131,16 +127,6 @@ const styles = StyleSheet.create({
     minHeight: 56,
   },
   
-  // Text sizes
-  smallText: {
-    fontSize: 14,
-  },
-  mediumText: {
-    fontSize: 16,
-  },
-  largeText: {
-    fontSize: 18,
-  },
   
   // Disabled states
   disabled: {

@@ -1,5 +1,6 @@
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { IconSymbol } from '@/components/ui/IconSymbol';
+import { Typography } from '@/src/utils/typography';
 
 interface ErrorScreenProps {
   message: string;
@@ -10,10 +11,10 @@ export function ErrorScreen({ message, onRetry }: ErrorScreenProps) {
   return (
     <View style={styles.container}>
       <IconSymbol name="exclamationmark.triangle" size={48} color="#FF3B30" />
-      <Text style={styles.message}>{message}</Text>
+      <Text style={[Typography.body1, styles.message]}>{message}</Text>
       {onRetry && (
         <TouchableOpacity onPress={onRetry} style={styles.retryButton}>
-          <Text style={styles.retryButtonText}>Try Again</Text>
+          <Text style={[Typography.button, styles.retryButtonText]}>Try Again</Text>
         </TouchableOpacity>
       )}
     </View>
@@ -30,7 +31,6 @@ const styles = StyleSheet.create({
   },
   message: {
     marginTop: 16,
-    fontSize: 16,
     color: '#666',
     textAlign: 'center',
     marginBottom: 24,
@@ -43,7 +43,5 @@ const styles = StyleSheet.create({
   },
   retryButtonText: {
     color: '#fff',
-    fontSize: 16,
-    fontWeight: '600',
   },
 });

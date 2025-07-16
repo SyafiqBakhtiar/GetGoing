@@ -112,6 +112,106 @@ export const THEME = {
     medium: 'System',
     bold: 'System',
   },
+  typography: {
+    // Display styles for large headings
+    display: {
+      fontSize: 40,
+      lineHeight: 48,
+      fontWeight: 'bold' as const,
+      letterSpacing: -0.5,
+    },
+    // Heading hierarchy
+    h1: {
+      fontSize: 32,
+      lineHeight: 40,
+      fontWeight: 'bold' as const,
+      letterSpacing: -0.25,
+    },
+    h2: {
+      fontSize: 28,
+      lineHeight: 36,
+      fontWeight: 'bold' as const,
+      letterSpacing: -0.25,
+    },
+    h3: {
+      fontSize: 24,
+      lineHeight: 32,
+      fontWeight: '600' as const,
+      letterSpacing: 0,
+    },
+    h4: {
+      fontSize: 20,
+      lineHeight: 28,
+      fontWeight: '600' as const,
+      letterSpacing: 0,
+    },
+    h5: {
+      fontSize: 18,
+      lineHeight: 24,
+      fontWeight: '600' as const,
+      letterSpacing: 0,
+    },
+    h6: {
+      fontSize: 16,
+      lineHeight: 24,
+      fontWeight: '600' as const,
+      letterSpacing: 0,
+    },
+    // Body text styles
+    body1: {
+      fontSize: 16,
+      lineHeight: 24,
+      fontWeight: '400' as const,
+      letterSpacing: 0,
+    },
+    body2: {
+      fontSize: 14,
+      lineHeight: 20,
+      fontWeight: '400' as const,
+      letterSpacing: 0,
+    },
+    // Specialized text styles
+    subtitle1: {
+      fontSize: 16,
+      lineHeight: 24,
+      fontWeight: '500' as const,
+      letterSpacing: 0.15,
+    },
+    subtitle2: {
+      fontSize: 14,
+      lineHeight: 20,
+      fontWeight: '500' as const,
+      letterSpacing: 0.1,
+    },
+    caption: {
+      fontSize: 12,
+      lineHeight: 16,
+      fontWeight: '400' as const,
+      letterSpacing: 0.4,
+    },
+    overline: {
+      fontSize: 10,
+      lineHeight: 16,
+      fontWeight: '500' as const,
+      letterSpacing: 1.5,
+      textTransform: 'uppercase' as const,
+    },
+    // Button text styles
+    button: {
+      fontSize: 14,
+      lineHeight: 20,
+      fontWeight: '600' as const,
+      letterSpacing: 0.25,
+    },
+    // Link styles
+    link: {
+      fontSize: 16,
+      lineHeight: 24,
+      fontWeight: '400' as const,
+      letterSpacing: 0,
+      textDecorationLine: 'underline' as const,
+    },
+  },
 };
 
 // Navigation constants

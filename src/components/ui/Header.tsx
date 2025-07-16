@@ -1,5 +1,6 @@
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { IconSymbol } from '@/components/ui/IconSymbol';
+import { Typography } from '@/src/utils/typography';
 
 interface HeaderProps {
   title: string;
@@ -28,8 +29,8 @@ export function Header({
           </TouchableOpacity>
         )}
         <View style={styles.titleContainer}>
-          <Text style={styles.title}>{title}</Text>
-          {subtitle && <Text style={styles.subtitle}>{subtitle}</Text>}
+          <Text style={[Typography.h5, styles.title]}>{title}</Text>
+          {subtitle && <Text style={[Typography.body2, styles.subtitle]}>{subtitle}</Text>}
         </View>
       </View>
       
@@ -66,12 +67,9 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   title: {
-    fontSize: 18,
-    fontWeight: '600',
     color: '#000',
   },
   subtitle: {
-    fontSize: 14,
     color: '#666',
     marginTop: 2,
   },

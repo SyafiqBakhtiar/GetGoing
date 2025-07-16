@@ -12,6 +12,7 @@ import {
   Text,
   View,
 } from 'react-native';
+import { Typography } from '../../utils/typography';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useBackgroundGradient, useTheme } from '../../providers/ThemeProvider';
 import type {
@@ -278,18 +279,15 @@ export function WelcomeScreen({ onGetStarted, responsiveConfig }: WelcomeScreenP
               {/* App branding */}
               <View style={[styles.brandingContainer, styles.brandingContainerLandscape]}>
                 <Text style={[
+                  Typography.h1,
                   styles.title,
                   {
-                    fontSize: config.styles.fontSize.title,
                     marginBottom: config.styles.spacing.component,
                   }
                 ]}>GetGoing</Text>
                 <Text style={[
+                  Typography.subtitle1,
                   styles.subtitle,
-                  {
-                    fontSize: config.styles.fontSize.subtitle,
-                    lineHeight: config.styles.fontSize.subtitle * ANIMATION_CONFIG.SUBTITLE_LINE_HEIGHT_MULTIPLIER,
-                  }
                 ]}>
                   Build. Achieve. Sustain.{'\n'}Repeat.
                 </Text>
@@ -305,7 +303,7 @@ export function WelcomeScreen({ onGetStarted, responsiveConfig }: WelcomeScreenP
                 }
               ]}>
                 <Button
-                  title="Get Started"
+                  title="Let's Begin"
                   onPress={handleGetStarted}
                   variant="primary"
                   size="large"
@@ -323,9 +321,9 @@ export function WelcomeScreen({ onGetStarted, responsiveConfig }: WelcomeScreenP
                   ]}
                 />
                 <Text style={[
+                  Typography.caption,
                   styles.trialNote,
                   {
-                    fontSize: config.styles.fontSize.caption,
                     marginTop: config.styles.spacing.component,
                   }
                 ]}>Free trial • No signup needed</Text>
@@ -358,18 +356,15 @@ export function WelcomeScreen({ onGetStarted, responsiveConfig }: WelcomeScreenP
               {/* App branding */}
               <View style={styles.brandingContainer}>
                 <Text style={[
+                  Typography.h1,
                   styles.title,
                   {
-                    fontSize: config.styles.fontSize.title,
                     marginBottom: config.styles.spacing.component,
                   }
                 ]}>GetGoing</Text>
                 <Text style={[
+                  Typography.subtitle1,
                   styles.subtitle,
-                  {
-                    fontSize: config.styles.fontSize.subtitle,
-                    lineHeight: config.styles.fontSize.subtitle * ANIMATION_CONFIG.SUBTITLE_LINE_HEIGHT_MULTIPLIER,
-                  }
                 ]}>
                  Build. Achieve. Sustain.{'\n'}Repeat.
                 </Text>
@@ -385,7 +380,7 @@ export function WelcomeScreen({ onGetStarted, responsiveConfig }: WelcomeScreenP
               }
             ]}>
               <Button
-                title="Get Started"
+                title="Let's Begin"
                 onPress={handleGetStarted}
                 variant="primary"
                 size="large"
@@ -403,9 +398,9 @@ export function WelcomeScreen({ onGetStarted, responsiveConfig }: WelcomeScreenP
                 ]}
               />
               <Text style={[
+                Typography.caption,
                 styles.trialNote,
                 {
-                  fontSize: config.styles.fontSize.caption,
                   marginTop: config.styles.spacing.component,
                 }
               ]}>Free trial • No signup needed</Text>
@@ -441,12 +436,10 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   title: {
-    fontWeight: 'bold',
     color: '#FFFFFF',
     textAlign: 'center',
   },
   subtitle: {
-    fontWeight: '300',
     color: 'rgba(255, 255, 255, 0.9)',
     textAlign: 'center',
   },
@@ -466,7 +459,6 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   trialNote: {
-    fontWeight: '300',
     color: 'rgba(255, 255, 255, 0.7)',
     textAlign: 'center',
   },

@@ -7,6 +7,14 @@
 6. Make every task and code change you do as simple as possible. We want to avoid making any massive or complex changes. Every change should impact as little code as possible. Everything is about simplicity.
 7. Finally, perform a code review of all changes and add a review section to the todo.md file with a summary of the changes you made and any other relevant information.
 
+## Key Requirements
+- **All code must be responsive across all devices**
+- **Use central typography system for consistency**
+- Test on Android and iOS
+- Use Expo SDK APIs when available
+- Run `npx expo-doctor` after major changes
+- Keep changes simple and minimal impact
+
 ## Mobile-Specific Guidelines
 - Always test changes on both Android and iOS when possible
 - Check Expo Development Builds compatibility before implementing any native features

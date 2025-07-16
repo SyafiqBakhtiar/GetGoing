@@ -196,8 +196,8 @@ export function getButtonDimensions(config?: ResponsiveConfig): {
   switch (deviceType) {
     case 'phone':
       return {
-        width: '88%',
-        maxWidth: 340,
+        width: '70%',
+        maxWidth: 280,
         minHeight: 50,
       };
     case 'tablet':
