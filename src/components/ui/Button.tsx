@@ -6,9 +6,11 @@ import {
   ViewStyle,
   TextStyle,
   ActivityIndicator,
+  View,
 } from 'react-native';
 import * as Haptics from 'expo-haptics';
 import { Typography } from '@/src/utils/typography';
+import { useTheme } from '../../providers/ThemeProvider';
 
 export interface ButtonProps {
   title: string;
@@ -33,12 +35,13 @@ export function Button({
   style,
   textStyle,
 }: ButtonProps) {
+  const { theme } = useTheme();
+  
   const buttonStyle = [
     styles.button,
     styles[variant],
     styles[size],
     disabled && styles.disabled,
-    style,
   ];
 
   const titleStyle = [
@@ -55,35 +58,42 @@ export function Button({
     onPress();
   };
 
+  const renderButtonContent = () => {
+    return (
+      <View style={buttonStyle}>
+        {loading ? (
+          <ActivityIndicator 
+            color={variant === 'primary' ? theme.colors.primary : '#FFFFFF'} 
+            size="small" 
+          />
+        ) : (
+          <Text style={titleStyle}>{title}</Text>
+        )}
+      </View>
+    );
+  };
+
   return (
     <TouchableOpacity
-      style={buttonStyle}
       onPress={handlePress}
       disabled={disabled || loading}
-      activeOpacity={0.8}
+      activeOpacity={0.85}
+      style={[styles.touchableContainer, style]}
     >
-      {loading ? (
-        <ActivityIndicator 
-          color={variant === 'primary' ? '#7C3AED' : '#FFFFFF'} 
-          size="small" 
-        />
-      ) : (
-        <Text style={titleStyle}>{title}</Text>
-      )}
+      {renderButtonContent()}
     </TouchableOpacity>
   );
 }
 
 const styles = StyleSheet.create({
+  touchableContainer: {
+    borderRadius: 28,
+    overflow: 'hidden',
+  },
   button: {
     borderRadius: 25,
     alignItems: 'center',
     justifyContent: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.2,
-    shadowRadius: 8,
-    elevation: 8,
   },
   
   // Variants
@@ -102,6 +112,8 @@ const styles = StyleSheet.create({
   // Text variants
   primaryText: {
     color: '#7C3AED',
+    fontWeight: '600',
+    letterSpacing: 0.5,
   },
   secondaryText: {
     color: '#FFFFFF',
@@ -122,7 +134,7 @@ const styles = StyleSheet.create({
     minHeight: 48,
   },
   large: {
-    paddingHorizontal: 48,
+    paddingHorizontal: 44,
     paddingVertical: 16,
     minHeight: 56,
   },

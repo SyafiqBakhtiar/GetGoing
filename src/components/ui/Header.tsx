@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ViewStyle } from 'react-native';
 import { IconSymbol } from '@/components/ui/IconSymbol';
 import { Typography } from '@/src/utils/typography';
 
@@ -11,6 +11,7 @@ interface HeaderProps {
     onPress: () => void;
   };
   onBackPress?: () => void;
+  style?: ViewStyle | ViewStyle[];
 }
 
 export function Header({ 
@@ -18,10 +19,11 @@ export function Header({
   subtitle, 
   showBackButton = false, 
   rightAction,
-  onBackPress 
+  onBackPress,
+  style
 }: HeaderProps) {
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, style]}>
       <View style={styles.leftSection}>
         {showBackButton && (
           <TouchableOpacity onPress={onBackPress} style={styles.backButton}>

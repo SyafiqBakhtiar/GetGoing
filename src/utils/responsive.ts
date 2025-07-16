@@ -16,17 +16,24 @@ export interface ResponsiveConfig {
 }
 
 export function getDeviceType(): DeviceType {
-  if (width < 768) {
-    return 'phone';
-  } else if (width < 1024) {
-    return 'tablet';
-  } else if (width < 1280) {
-    return 'laptop';
-  } else if (width < 1536) {
-    return 'desktop';
+  let deviceType: DeviceType;
+  
+  // Updated breakpoints to be more mobile-friendly
+  // Many modern phones have high resolution screens > 768px
+  if (width < 900) {
+    deviceType = 'phone';
+  } else if (width < 1200) {
+    deviceType = 'tablet';
+  } else if (width < 1400) {
+    deviceType = 'laptop';
+  } else if (width < 1700) {
+    deviceType = 'desktop';
   } else {
-    return 'largeDesktop';
+    deviceType = 'largeDesktop';
   }
+  
+  
+  return deviceType;
 }
 
 export function getResponsiveConfig(): ResponsiveConfig {
@@ -219,44 +226,49 @@ export function getConstrainedWidth(
 }
 
 export function getButtonDimensions(config?: ResponsiveConfig): {
-  width: string | number;
-  maxWidth: number;
+  width: string;
   minHeight: number;
 } {
   const { deviceType } = config || getResponsiveConfig();
   
+  let result: { width: string; minHeight: number };
+  
   switch (deviceType) {
     case 'phone':
-      return {
-        width: '70%',
-        maxWidth: 280,
+      result = {
+        width: '80%',
         minHeight: 50,
       };
+      break;
     case 'tablet':
-      return {
-        width: 420,
-        maxWidth: 480,
+      result = {
+        width: '70%',
         minHeight: 54,
       };
+      break;
     case 'laptop':
-      return {
-        width: 480,
-        maxWidth: 520,
+      result = {
+        width: '60%',
         minHeight: 56,
       };
+      break;
     case 'desktop':
-      return {
-        width: 520,
-        maxWidth: 580,
+      result = {
+        width: '50%',
         minHeight: 58,
       };
+      break;
     case 'largeDesktop':
-      return {
-        width: 580,
-        maxWidth: 640,
+      result = {
+        width: '40%',
         minHeight: 60,
       };
+      break;
   }
+  
+  // DEBUG: Log button dimensions
+  
+  return result;
 }
 
 export function getThumbZoneSpacing(
@@ -520,23 +532,6 @@ export function getResponsiveViewBox(
     responsiveConfig.deviceType
   );
   
-  // Debug logging (only in development and when debug is enabled)
-  if (__DEV__ && debug) {
-    console.log('ViewBox Debug:', {
-      original: baseViewBoxString,
-      parsed: baseViewBox,
-      aspectRatio: responsiveConfig.aspectRatio,
-      deviceType: responsiveConfig.deviceType,
-      isLandscape: responsiveConfig.isLandscape,
-      afterAspectRatio: aspectRatioAdjustedViewBox,
-      final: finalViewBox,
-      formatted: formatViewBox(finalViewBox),
-      sizeChange: {
-        widthChange: ((finalViewBox.width - baseViewBox.width) / baseViewBox.width * 100).toFixed(1) + '%',
-        heightChange: ((finalViewBox.height - baseViewBox.height) / baseViewBox.height * 100).toFixed(1) + '%'
-      }
-    });
-  }
   
   return formatViewBox(finalViewBox);
 }

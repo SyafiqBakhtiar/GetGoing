@@ -1,3 +1,4 @@
+import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import { LinearGradient } from 'expo-linear-gradient';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
@@ -12,8 +13,6 @@ import {
   Text,
   View,
 } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
-import { Typography } from '../../utils/typography';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useBackgroundGradient, useTheme } from '../../providers/ThemeProvider';
 import type {
@@ -33,6 +32,7 @@ import {
   getSafeAreaSpacing,
   getThumbZoneSpacing,
 } from '../../utils/responsive';
+import { Typography } from '../../utils/typography';
 import { Button } from '../ui/Button';
 import { AnimatedPenguin } from './AnimatedPenguin';
 import { SnowEffect } from './SnowEffect';
@@ -132,6 +132,9 @@ export function WelcomeScreen({ onGetStarted, responsiveConfig }: WelcomeScreenP
   const insets = useSafeAreaInsets();
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const slideAnim = useRef(new Animated.Value(ANIMATION_CONFIG.INITIAL_SLIDE_OFFSET)).current;
+  const penguinAnim = useRef(new Animated.Value(0)).current;
+  const textAnim = useRef(new Animated.Value(0)).current;
+  const buttonAnim = useRef(new Animated.Value(0)).current;
   
   const [appState, setAppState] = useState<AppStateStatus>(AppState.currentState);
   const backgroundGradient = useBackgroundGradient();
@@ -150,13 +153,16 @@ export function WelcomeScreen({ onGetStarted, responsiveConfig }: WelcomeScreenP
     const safeAreaSpacing = getSafeAreaSpacing(20, insets, responsiveConfigLocal);
     const baseConfig = createResponsiveConfiguration();
     
-    return {
+    const finalConfig = {
       ...baseConfig,
       layout: {
         ...baseConfig.layout,
         safeArea: safeAreaSpacing,
       },
     };
+    
+    
+    return finalConfig;
   }, [responsiveConfig, insets]);
 
   // Handle app state changes for performance optimization
@@ -201,8 +207,10 @@ export function WelcomeScreen({ onGetStarted, responsiveConfig }: WelcomeScreenP
   // Enhanced Trust Signal Component
   const TrustSignal = ({ spacing }: { spacing: number }) => (
     <View style={[styles.trustSignalContainer, { marginTop: spacing }]}>
-      <View style={styles.trustItem}>
-        <Ionicons name="shield-checkmark" size={16} color="rgba(255, 255, 255, 0.8)" />
+      <View style={styles.premiumTrustBadge}>
+        <View style={styles.trustIconContainer}>
+          <Ionicons name="shield-checkmark" size={18} color="rgba(255, 255, 255, 0.95)" />
+        </View>
         <Text style={[Typography.helpText, styles.trustText]}>
           Your data stays private & secure
         </Text>
@@ -211,7 +219,7 @@ export function WelcomeScreen({ onGetStarted, responsiveConfig }: WelcomeScreenP
   );
 
   useEffect(() => {
-    // Entrance animation
+    // Enhanced entrance animation with staggered spring physics
     Animated.parallel([
       Animated.timing(fadeAnim, {
         toValue: 1,
@@ -219,10 +227,32 @@ export function WelcomeScreen({ onGetStarted, responsiveConfig }: WelcomeScreenP
         easing: Easing.out(Easing.cubic),
         useNativeDriver: true,
       }),
-      Animated.timing(slideAnim, {
+      Animated.spring(slideAnim, {
         toValue: 0,
-        duration: ANIMATION_CONFIG.ENTRANCE_DURATION,
-        easing: Easing.out(Easing.cubic),
+        tension: 65,
+        friction: 8,
+        useNativeDriver: true,
+      }),
+    ]).start();
+
+    // Staggered animations for premium feel
+    Animated.stagger(150, [
+      Animated.spring(penguinAnim, {
+        toValue: 1,
+        tension: 60,
+        friction: 8,
+        useNativeDriver: true,
+      }),
+      Animated.spring(textAnim, {
+        toValue: 1,
+        tension: 70,
+        friction: 9,
+        useNativeDriver: true,
+      }),
+      Animated.spring(buttonAnim, {
+        toValue: 1,
+        tension: 80,
+        friction: 10,
         useNativeDriver: true,
       }),
     ]).start();
@@ -230,15 +260,12 @@ export function WelcomeScreen({ onGetStarted, responsiveConfig }: WelcomeScreenP
 
   return (
     <View style={styles.container}>
-      {/* Optimized single background gradient */}
       <LinearGradient
         colors={backgroundGradient.colors as any}
         start={backgroundGradient.start}
         end={backgroundGradient.end}
         style={StyleSheet.absoluteFillObject}
       />
-
-      
       {/* Snow effect - adaptive intensity */}
       <SnowEffect 
         intensity={performanceConfig.snowIntensity} 
@@ -263,11 +290,26 @@ export function WelcomeScreen({ onGetStarted, responsiveConfig }: WelcomeScreenP
           // Landscape horizontal layout
           <>
             {/* Penguin Column */}
-            <View style={[
+            <Animated.View style={[
               styles.penguinColumn,
               {
                 width: config.layout.landscape.penguinColumnWidth as DimensionValue,
                 marginRight: config.layout.landscape.horizontalSpacing,
+                opacity: penguinAnim,
+                transform: [
+                  {
+                    scale: penguinAnim.interpolate({
+                      inputRange: [0, 1],
+                      outputRange: [0.8, 1],
+                    }),
+                  },
+                  {
+                    translateY: penguinAnim.interpolate({
+                      inputRange: [0, 1],
+                      outputRange: [30, 0],
+                    }),
+                  },
+                ],
               }
             ]}>
               <View style={[
@@ -279,7 +321,7 @@ export function WelcomeScreen({ onGetStarted, responsiveConfig }: WelcomeScreenP
                   useStaticViewBox={config.dimensions.deviceType === 'phone'}
                 />
               </View>
-            </View>
+            </Animated.View>
 
             {/* Content Column */}
             <View style={[
@@ -290,29 +332,60 @@ export function WelcomeScreen({ onGetStarted, responsiveConfig }: WelcomeScreenP
               }
             ]}>
               {/* App branding */}
-              <View style={[styles.brandingContainer, styles.brandingContainerLandscape]}>
-                <Text style={[
-                  Typography.appName,
-                  styles.title,
-                  {
-                    marginBottom: config.styles.spacing.component,
-                  }
-                ]}>GetGoing</Text>
-                <Text style={[
-                  Typography.tagline,
-                  styles.subtitle,
-                ]}>
-                  Build. Achieve. Sustain.{'\n'}Repeat.
-                </Text>
-              </View>
+              <Animated.View style={[
+                styles.brandingContainer, 
+                styles.brandingContainerLandscape,
+                {
+                  opacity: textAnim,
+                  transform: [
+                    {
+                      translateY: textAnim.interpolate({
+                        inputRange: [0, 1],
+                        outputRange: [20, 0],
+                      }),
+                    },
+                  ],
+                }
+              ]}>
+                <View>
+                  <Text style={[
+                    Typography.appName,
+                    styles.title,
+                    {
+                      marginBottom: config.styles.spacing.component,
+                    }
+                  ]}>GetGoing</Text>
+                  <Text style={[
+                    Typography.tagline,
+                    styles.subtitle,
+                  ]}>
+                    Small Steps. Big Wins.
+                  </Text>
+                </View>
+              </Animated.View>
 
               {/* Get Started button */}
-              <View style={[
+              <Animated.View style={[
                 styles.buttonContainer,
                 styles.buttonContainerLandscape,
                 {
                   minHeight: config.layout.buttonContainer.minHeight,
                   marginBottom: config.layout.buttonContainer.marginBottom,
+                  opacity: buttonAnim,
+                  transform: [
+                    {
+                      translateY: buttonAnim.interpolate({
+                        inputRange: [0, 1],
+                        outputRange: [40, 0],
+                      }),
+                    },
+                    {
+                      scale: buttonAnim.interpolate({
+                        inputRange: [0, 1],
+                        outputRange: [0.9, 1],
+                      }),
+                    },
+                  ],
                 }
               ]}>
                 <Button
@@ -324,7 +397,6 @@ export function WelcomeScreen({ onGetStarted, responsiveConfig }: WelcomeScreenP
                     styles.getStartedButton,
                     {
                       width: config.styles.dimensions.button.width as DimensionValue,
-                      maxWidth: config.styles.dimensions.button.maxWidth,
                       minHeight: config.styles.dimensions.button.minHeight,
                     }
                   ]}
@@ -334,7 +406,7 @@ export function WelcomeScreen({ onGetStarted, responsiveConfig }: WelcomeScreenP
                   ]}
                 />
                 <TrustSignal spacing={config.styles.spacing.component} />
-              </View>
+              </Animated.View>
             </View>
           </>
         ) : (
@@ -350,40 +422,87 @@ export function WelcomeScreen({ onGetStarted, responsiveConfig }: WelcomeScreenP
               }
             ]}>
               {/* Penguin */}
-              <View style={[
+              <Animated.View style={[
                 styles.penguinContainer,
-                { marginBottom: config.styles.spacing.component * SPACING_MULTIPLIERS.PENGUIN_BOTTOM_MARGIN }
+                { 
+                  marginBottom: config.styles.spacing.component * SPACING_MULTIPLIERS.PENGUIN_BOTTOM_MARGIN,
+                  opacity: penguinAnim,
+                  transform: [
+                    {
+                      scale: penguinAnim.interpolate({
+                        inputRange: [0, 1],
+                        outputRange: [0.8, 1],
+                      }),
+                    },
+                    {
+                      translateY: penguinAnim.interpolate({
+                        inputRange: [0, 1],
+                        outputRange: [30, 0],
+                      }),
+                    },
+                  ],
+                }
               ]}>
                 <AnimatedPenguin 
                   size={config.styles.dimensions.penguin} 
                   useStaticViewBox={config.dimensions.deviceType === 'phone'}
                 />
-              </View>
+              </Animated.View>
 
               {/* App branding */}
-              <View style={styles.brandingContainer}>
-                <Text style={[
-                  Typography.appName,
-                  styles.title,
-                  {
-                    marginBottom: config.styles.spacing.component,
-                  }
-                ]}>GetGoing</Text>
-                <Text style={[
-                  Typography.tagline,
-                  styles.subtitle,
-                ]}>
-                 Build. Achieve. Sustain.{'\n'}Repeat.
-                </Text>
-              </View>
+              <Animated.View style={[
+                styles.brandingContainer,
+                {
+                  opacity: textAnim,
+                  transform: [
+                    {
+                      translateY: textAnim.interpolate({
+                        inputRange: [0, 1],
+                        outputRange: [20, 0],
+                      }),
+                    },
+                  ],
+                }
+              ]}>
+                <View>
+                  <Text style={[
+                    Typography.appName,
+                    styles.title,
+                    {
+                      marginBottom: config.styles.spacing.component,
+                    }
+                  ]}>GetGoing</Text>
+                  <Text style={[
+                    Typography.tagline,
+                    styles.subtitle,
+                  ]}>
+                  Small Steps. Big Wins.
+                  </Text>
+                </View>
+              </Animated.View>
             </View>
 
             {/* Get Started button - Optimally positioned */}
-            <View style={[
+            <Animated.View style={[
               styles.buttonContainer,
               {
                 minHeight: config.layout.buttonContainer.minHeight,
                 marginBottom: config.layout.buttonContainer.marginBottom,
+                opacity: buttonAnim,
+                transform: [
+                  {
+                    translateY: buttonAnim.interpolate({
+                      inputRange: [0, 1],
+                      outputRange: [40, 0],
+                    }),
+                  },
+                  {
+                    scale: buttonAnim.interpolate({
+                      inputRange: [0, 1],
+                      outputRange: [0.9, 1],
+                    }),
+                  },
+                ],
               }
             ]}>
               <Button
@@ -395,7 +514,6 @@ export function WelcomeScreen({ onGetStarted, responsiveConfig }: WelcomeScreenP
                   styles.getStartedButton,
                   {
                     width: config.styles.dimensions.button.width as DimensionValue,
-                    maxWidth: config.styles.dimensions.button.maxWidth,
                     minHeight: config.styles.dimensions.button.minHeight,
                   }
                 ]}
@@ -405,7 +523,7 @@ export function WelcomeScreen({ onGetStarted, responsiveConfig }: WelcomeScreenP
                 ]}
               />
               <TrustSignal spacing={config.styles.spacing.component} />
-            </View>
+            </Animated.View>
           </>
         )}
       </Animated.View>
@@ -422,6 +540,7 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'space-between',
+    zIndex: 2,
   },
   centeredContent: {
     alignItems: 'center',
@@ -431,6 +550,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     position: 'relative',
+    shadowColor: 'rgba(0, 0, 0, 0.1)',
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.15,
+    shadowRadius: 20,
+    elevation: 8,
   },
   brandingContainer: {
     alignItems: 'center',
@@ -450,11 +574,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   getStartedButton: {
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.3,
-    shadowRadius: 16,
-    elevation: 16,
+    // Clean button without shadows
   },
   buttonText: {
     fontWeight: '600',
@@ -488,13 +608,34 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 8,
   },
+  premiumTrustBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(255, 255, 255, 0.06)',
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.1)',
+    shadowColor: 'rgba(0, 0, 0, 0.1)',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 2,
+  },
+  trustIconContainer: {
+    marginRight: 8,
+    padding: 2,
+  },
   trustItem: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
   },
   trustText: {
-    color: 'rgba(255, 255, 255, 0.8)',
+    color: 'rgba(255, 255, 255, 0.9)',
     textAlign: 'center',
+    fontSize: 13,
+    fontWeight: '500',
   },
 });

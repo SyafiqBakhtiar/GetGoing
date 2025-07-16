@@ -22,10 +22,10 @@ export const THEME = {
   backgrounds: {
     gradients: {
       calm: {
-        colors: ['#F0F9FF', '#7DD3FC', '#0284C7', '#0C4A6E'],
+        colors: ['#F0F9FF', '#E0F2FE', '#7DD3FC', '#0284C7', '#0C4A6E'],
         start: { x: 0, y: 0 },
-        end: { x: 1, y: 1 },
-        description: 'Calming blue gradient for focus and productivity',
+        end: { x: 1, y: 1.1 },
+        description: 'Premium calming gradient with enhanced depth and sophistication',
       },
       energetic: {
         colors: ['#FEF3C7', '#F59E0B', '#DC2626', '#7F1D1D'],
@@ -64,10 +64,10 @@ export const THEME = {
         description: 'Natural earth tones for grounding and connection',
       },
       corporate: {
-        colors: ['#F8FAFC', '#E1E7EF', '#3B82F6', '#1E3A8A'],
+        colors: ['#F8FAFC', '#E0E7FF', '#C7D2FE', '#A5B4FC', '#8B5CF6', '#7C3AED'],
         start: { x: 0, y: 0 },
-        end: { x: 1, y: 1 },
-        description: 'Professional blue gradient for business environments',
+        end: { x: 1, y: 1.3 },
+        description: 'Premium sophisticated gradient with deep purple sophistication',
       },
       retro: {
         colors: ['#FEF3C7', '#F59E0B', '#D97706', '#92400E'],

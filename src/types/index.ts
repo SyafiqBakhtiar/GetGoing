@@ -162,8 +162,7 @@ export interface ResponsiveStyles {
   dimensions: {
     penguin: number;
     button: {
-      width: string | number;
-      maxWidth: number;
+      width: string;
       minHeight: number;
     };
     decorativeCircles: {

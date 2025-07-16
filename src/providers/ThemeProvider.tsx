@@ -25,7 +25,7 @@ const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 // Theme storage key
 const THEME_STORAGE_KEY = `${STORAGE_KEYS.theme}_mode`;
 
-export function ThemeProvider({ children, defaultTheme = 'corporate' }: ThemeProviderProps) {
+export function ThemeProvider({ children, defaultTheme = 'futuristic' }: ThemeProviderProps) {
   const [currentTheme, setCurrentTheme] = useState<ThemeMode>(defaultTheme);
   const [isLoading, setIsLoading] = useState(true);
 

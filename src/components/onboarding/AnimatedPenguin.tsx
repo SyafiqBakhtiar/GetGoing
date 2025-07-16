@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { Animated, AppState, AppStateStatus, Easing } from 'react-native';
+import { Animated, AppState, AppStateStatus, Easing, View, ViewStyle } from 'react-native';
 import Svg, {
   Circle,
   Defs,
@@ -23,9 +23,10 @@ interface AnimatedPenguinProps {
   useDynamicViewBox?: boolean; // Optional prop to disable dynamic viewBox
   useStaticViewBox?: boolean; // Force static viewBox (overrides useDynamicViewBox)
   debug?: boolean; // Optional prop to enable debug logging
+  style?: ViewStyle | ViewStyle[]; // Container style customization
 }
 
-export function AnimatedPenguin({ size = 160, useDynamicViewBox = true, useStaticViewBox = false, debug = false }: AnimatedPenguinProps) {
+export function AnimatedPenguin({ size = 160, useDynamicViewBox = true, useStaticViewBox = false, debug = false, style }: AnimatedPenguinProps) {
   const waddleAnim = useRef(new Animated.Value(0)).current;
   const bobAnim = useRef(new Animated.Value(0)).current;
   const wingLeftAnim = useRef(new Animated.Value(0)).current;
@@ -95,16 +96,16 @@ export function AnimatedPenguin({ size = 160, useDynamicViewBox = true, useStati
           aspectRatio: responsiveConfig.aspectRatio
         });
       }
-      return '0 0 500 320'; // Force static viewBox or fallback
+      return '0 0 600 320'; // Force static viewBox or fallback
     }
     
     try {
-      return getResponsiveViewBox('0 0 500 320', responsiveConfig, debug);
+      return getResponsiveViewBox('-50 0 600 320', responsiveConfig, debug);
     } catch (error) {
       if (__DEV__) {
         console.error('AnimatedPenguin: Error calculating ice floor viewBox, using fallback:', error);
       }
-      return '0 0 500 320'; // Fallback to static viewBox on error
+      return '0 0 600 320'; // Fallback to static viewBox on error
     }
   }, [responsiveConfig, useDynamicViewBox, shouldUseStaticViewBox, debug]);
   
@@ -370,11 +371,11 @@ export function AnimatedPenguin({ size = 160, useDynamicViewBox = true, useStati
   });
 
   return (
-    <>
+    <View style={style}>
      {/* Static ice floor - not animated */}
      <Svg
-     width={adjustedSize * iceFloorScale.width}
-     height={adjustedSize * iceFloorScale.height}
+     width={adjustedSize}
+     height={adjustedSize}
      viewBox={iceFloorViewBox}
      style={{
        position: 'absolute',
@@ -391,62 +392,19 @@ export function AnimatedPenguin({ size = 160, useDynamicViewBox = true, useStati
             <Stop offset="80%" stopColor="rgba(59, 130, 246, 0.2)" />
             <Stop offset="100%" stopColor="rgba(29, 78, 216, 0.1)" />
           </RadialGradient>
-          
-          {/* Glass reflection gradient */}
-          <LinearGradient id="glassReflectionGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-            <Stop offset="0%" stopColor="rgba(255, 255, 255, 0.0)" />
-            <Stop offset="30%" stopColor="rgba(255, 255, 255, 0.7)" />
-            <Stop offset="70%" stopColor="rgba(255, 255, 255, 0.7)" />
-            <Stop offset="100%" stopColor="rgba(255, 255, 255, 0.0)" />
-          </LinearGradient>
-          
-          
-          {/* Ice texture pattern */}
-          <LinearGradient id="iceTextureGradient" x1="0%" y1="0%" x2="0%" y2="100%">
-            <Stop offset="0%" stopColor="rgba(255, 255, 255, 0.3)" />
-            <Stop offset="100%" stopColor="rgba(186, 230, 253, 0.2)" />
-          </LinearGradient>
+         
         </Defs>
 
         {/* Main glass ice floor */}
         <Ellipse
-          cx="250"
-          cy="260"
-          rx="150"
-          ry="30"
+          cx="50%"
+          cy="60%"
+          rx="50%"
+          ry="5%"
           fill="url(#staticIceFloorGradient)"     
         />
         
-        {/* Glass reflection highlight */}
-        <Ellipse
-          cx="250"
-          cy="252"
-          rx="120"
-          ry="12"
-          fill="url(#glassReflectionGradient)"
-          opacity="0.8"
-        />
-        
-        {/* Secondary reflection */}
-        <Ellipse
-          cx="250"
-          cy="268"
-          rx="80"
-          ry="8"
-          fill="url(#glassReflectionGradient)"
-          opacity="0.4"
-        />
-        
-        {/* Crystalline edge highlights */}
-        <Ellipse
-          cx="250"
-          cy="260"
-          rx="150"
-          ry="30"
-          fill="none"
-          stroke="rgba(255, 255, 255, 0.3)"
-          strokeWidth="1"
-        />
+       
         
         
         {/* Enhanced ice floor sparkles with glow (responsive positioning) */}
@@ -454,17 +412,17 @@ export function AnimatedPenguin({ size = 160, useDynamicViewBox = true, useStati
           <G>
             {/* Sparkle 1 glow */}
             <AnimatedCircle
-              cx="76%"
-              cy="77.6%"
-              r="8"
+              cx="80%"
+              cy="59%"
+              r="1.3%"
               fill="rgba(255, 255, 255, 0.2)"
               opacity={sparkle1Opacity}
             />
             {/* Sparkle 1 core */}
             <AnimatedCircle
-              cx="76%"
-              cy="77.6%"
-              r="5"
+             cx="80%"
+              cy="59%"
+              r="1%"
               fill="#FFFFFF"
               opacity={sparkle1Opacity}
             />
@@ -474,16 +432,16 @@ export function AnimatedPenguin({ size = 160, useDynamicViewBox = true, useStati
           <G>
             {/* Sparkle 2 glow */}
             <AnimatedCircle
-              cx="78%"
-              cy="83.8%"
+              cx="54%"
+              cy="71.8%"
               r="7"
               fill="rgba(255, 255, 255, 0.15)"
               opacity={sparkle2Opacity}
             />
             {/* Sparkle 2 core */}
             <AnimatedCircle
-              cx="78%"
-              cy="83.8%"
+              cx="54%"
+              cy="71.8%"
               r="4"
               fill="#FFFFFF"
               opacity={sparkle2Opacity}
@@ -494,16 +452,16 @@ export function AnimatedPenguin({ size = 160, useDynamicViewBox = true, useStati
           <G>
             {/* Sparkle 3 glow */}
             <AnimatedCircle
-              cx="77%"
-              cy="86.9%"
+              cx="53%"
+              cy="74.9%"
               r="10"
               fill="rgba(255, 255, 255, 0.25)"
               opacity={sparkle3Opacity}
             />
             {/* Sparkle 3 core */}
             <AnimatedCircle
-              cx="77%"
-              cy="86.9%"
+              cx="53%"
+              cy="74.9%"
               r="6"
               fill="#FFFFFF"
               opacity={sparkle3Opacity}
@@ -673,6 +631,6 @@ export function AnimatedPenguin({ size = 160, useDynamicViewBox = true, useStati
         />
       </Svg>
     </Animated.View>
-    </>
+    </View>
   );
 }

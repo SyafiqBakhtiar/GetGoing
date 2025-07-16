@@ -1,5 +1,5 @@
 import { PropsWithChildren, useState } from 'react';
-import { StyleSheet, TouchableOpacity } from 'react-native';
+import { StyleSheet, TouchableOpacity, ViewStyle } from 'react-native';
 
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
@@ -7,14 +7,14 @@ import { IconSymbol } from '@/components/ui/IconSymbol';
 import { Colors } from '@/constants/Colors';
 import { useColorScheme } from '@/hooks/useColorScheme';
 
-export function Collapsible({ children, title }: PropsWithChildren & { title: string }) {
+export function Collapsible({ children, title, style }: PropsWithChildren & { title: string; style?: ViewStyle | ViewStyle[] }) {
   const [isOpen, setIsOpen] = useState(false);
   const theme = useColorScheme() ?? 'light';
 
   return (
     <ThemedView>
       <TouchableOpacity
-        style={styles.heading}
+        style={[styles.heading, style]}
         onPress={() => setIsOpen((value) => !value)}
         activeOpacity={0.8}>
         <IconSymbol
