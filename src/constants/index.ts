@@ -111,6 +111,13 @@ export const THEME = {
     regular: 'System',
     medium: 'System',
     bold: 'System',
+    inter: {
+      regular: 'Inter_400Regular',
+      medium: 'Inter_500Medium',
+      semiBold: 'Inter_600SemiBold',
+      bold: 'Inter_700Bold',
+      extraBold: 'Inter_800ExtraBold',
+    },
   },
   typography: {
     // Display styles for large headings
@@ -210,6 +217,89 @@ export const THEME = {
       fontWeight: '400' as const,
       letterSpacing: 0,
       textDecorationLine: 'underline' as const,
+    },
+    // Semantic Typography Variants
+    // Screenshot-style (Bold, Strong) - for branding, primary headings, CTAs, achievements
+    appName: {
+      fontSize: 40,
+      lineHeight: 48,
+      fontWeight: 'bold' as const,
+      letterSpacing: -0.5,
+    },
+    primaryHeading: {
+      fontSize: 28,
+      lineHeight: 36,
+      fontWeight: 'bold' as const,
+      letterSpacing: -0.25,
+    },
+    ctaButton: {
+      fontSize: 18,
+      lineHeight: 24,
+      fontWeight: 'bold' as const,
+      letterSpacing: 0.25,
+      textTransform: 'none' as const,
+    },
+    achievement: {
+      fontSize: 24,
+      lineHeight: 32,
+      fontWeight: 'bold' as const,
+      letterSpacing: -0.25,
+    },
+    navigationHeader: {
+      fontSize: 20,
+      lineHeight: 28,
+      fontWeight: 'bold' as const,
+      letterSpacing: 0,
+    },
+    heroSection: {
+      fontSize: 32,
+      lineHeight: 40,
+      fontWeight: 'bold' as const,
+      letterSpacing: -0.25,
+    },
+    // Forest-style (Light/Regular) - for body text, descriptions, secondary content
+    tagline: {
+      fontSize: 18,
+      lineHeight: 24,
+      fontWeight: '300' as const,
+      letterSpacing: 0.15,
+    },
+    bodyText: {
+      fontSize: 16,
+      lineHeight: 24,
+      fontWeight: '400' as const,
+      letterSpacing: 0,
+    },
+    secondaryHeading: {
+      fontSize: 20,
+      lineHeight: 28,
+      fontWeight: '500' as const,
+      letterSpacing: 0,
+    },
+    formLabel: {
+      fontSize: 14,
+      lineHeight: 20,
+      fontWeight: '400' as const,
+      letterSpacing: 0,
+    },
+    quote: {
+      fontSize: 16,
+      lineHeight: 24,
+      fontWeight: '300' as const,
+      letterSpacing: 0,
+      fontStyle: 'italic' as const,
+    },
+    helpText: {
+      fontSize: 14,
+      lineHeight: 20,
+      fontWeight: '300' as const,
+      letterSpacing: 0.1,
+    },
+    timestamp: {
+      fontSize: 12,
+      lineHeight: 16,
+      fontWeight: '300' as const,
+      letterSpacing: 0.4,
     },
   },
 };

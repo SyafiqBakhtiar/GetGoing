@@ -47,6 +47,7 @@ export function getTypographyStyles<T extends TypographyVariant>(
  * Typography utility class for easy access to all styles
  */
 export class Typography {
+  // Original typography variants (maintained for backward compatibility)
   static display = getTypographyStyle('display');
   static h1 = getTypographyStyle('h1');
   static h2 = getTypographyStyle('h2');
@@ -62,6 +63,24 @@ export class Typography {
   static overline = getTypographyStyle('overline');
   static button = getTypographyStyle('button');
   static link = getTypographyStyle('link');
+
+  // Semantic Typography Variants
+  // Screenshot-style (Bold, Strong) - for branding impact and strong identity
+  static appName = getTypographyStyle('appName');
+  static primaryHeading = getTypographyStyle('primaryHeading');
+  static ctaButton = getTypographyStyle('ctaButton');
+  static achievement = getTypographyStyle('achievement');
+  static navigationHeader = getTypographyStyle('navigationHeader');
+  static heroSection = getTypographyStyle('heroSection');
+
+  // Forest-style (Light/Regular) - for readability and calm tone
+  static tagline = getTypographyStyle('tagline');
+  static bodyText = getTypographyStyle('bodyText');
+  static secondaryHeading = getTypographyStyle('secondaryHeading');
+  static formLabel = getTypographyStyle('formLabel');
+  static quote = getTypographyStyle('quote');
+  static helpText = getTypographyStyle('helpText');
+  static timestamp = getTypographyStyle('timestamp');
 
   /**
    * Get a specific typography style

@@ -4,7 +4,7 @@ import type { ViewBoxDimensions, ViewBoxAdjustments, ViewBoxConfig } from '../ty
 
 const { width, height } = Dimensions.get('window');
 
-export type DeviceType = 'phone' | 'tablet' | 'desktop';
+export type DeviceType = 'phone' | 'tablet' | 'laptop' | 'desktop' | 'largeDesktop';
 
 export interface ResponsiveConfig {
   deviceType: DeviceType;
@@ -20,8 +20,12 @@ export function getDeviceType(): DeviceType {
     return 'phone';
   } else if (width < 1024) {
     return 'tablet';
-  } else {
+  } else if (width < 1280) {
+    return 'laptop';
+  } else if (width < 1536) {
     return 'desktop';
+  } else {
+    return 'largeDesktop';
   }
 }
 
@@ -33,7 +37,7 @@ export function getResponsiveConfig(): ResponsiveConfig {
   
   return {
     deviceType,
-    isSmallPhone: width < 380,
+    isSmallPhone: width < 375,
     isLargeScreen: width >= 768,
     isLandscape,
     aspectRatio,
@@ -56,10 +60,16 @@ export function getResponsiveFontSize(
       if (isLandscape) scaleFactor *= 0.9;
       break;
     case 'tablet':
+      scaleFactor = 1.2;
+      break;
+    case 'laptop':
       scaleFactor = 1.3;
       break;
     case 'desktop':
       scaleFactor = 1.5;
+      break;
+    case 'largeDesktop':
+      scaleFactor = 1.7;
       break;
   }
   
@@ -85,10 +95,16 @@ export function getResponsiveSpacing(
       spacing = isSmallPhone ? baseSpacing * 0.8 : baseSpacing;
       break;
     case 'tablet':
+      spacing = baseSpacing * 1.2;
+      break;
+    case 'laptop':
       spacing = baseSpacing * 1.4;
       break;
     case 'desktop':
       spacing = baseSpacing * 1.6;
+      break;
+    case 'largeDesktop':
+      spacing = baseSpacing * 1.8;
       break;
   }
   
@@ -113,10 +129,16 @@ export function getResponsiveSize(
       size = isSmallPhone ? baseSize * 0.9 : baseSize;
       break;
     case 'tablet':
+      size = baseSize * 1.1;
+      break;
+    case 'laptop':
       size = baseSize * 1.2;
       break;
     case 'desktop':
       size = baseSize * 1.4;
+      break;
+    case 'largeDesktop':
+      size = baseSize * 1.6;
       break;
   }
   
@@ -144,10 +166,20 @@ export function getContainerConstraints(config?: ResponsiveConfig): {
         maxWidth: 600,
         paddingHorizontal: 40,
       };
-    case 'desktop':
+    case 'laptop':
       return {
         maxWidth: 800,
+        paddingHorizontal: 50,
+      };
+    case 'desktop':
+      return {
+        maxWidth: 1000,
         paddingHorizontal: 60,
+      };
+    case 'largeDesktop':
+      return {
+        maxWidth: 1200,
+        paddingHorizontal: 80,
       };
   }
 }
@@ -206,11 +238,23 @@ export function getButtonDimensions(config?: ResponsiveConfig): {
         maxWidth: 480,
         minHeight: 54,
       };
-    case 'desktop':
+    case 'laptop':
       return {
         width: 480,
         maxWidth: 520,
+        minHeight: 56,
+      };
+    case 'desktop':
+      return {
+        width: 520,
+        maxWidth: 580,
         minHeight: 58,
+      };
+    case 'largeDesktop':
+      return {
+        width: 580,
+        maxWidth: 640,
+        minHeight: 60,
       };
   }
 }
@@ -225,16 +269,40 @@ export function getThumbZoneSpacing(
   const { deviceType, isSmallPhone } = config || getResponsiveConfig();
   
   // Optimal thumb zone: 60-80px from bottom edge
-  const baseBottomOffset = deviceType === 'phone' 
-    ? (isSmallPhone ? 50 : 60)
-    : 80;
+  let baseBottomOffset: number;
+  switch (deviceType) {
+    case 'phone':
+      baseBottomOffset = isSmallPhone ? 50 : 60;
+      break;
+    case 'tablet':
+    case 'laptop':
+      baseBottomOffset = 80;
+      break;
+    case 'desktop':
+    case 'largeDesktop':
+      baseBottomOffset = 100;
+      break;
+  }
   
   const bottomOffset = Math.max(baseBottomOffset, insets.bottom + 20);
   
   // Container height includes button + trial note + spacing
-  const containerHeight = deviceType === 'phone'
-    ? (isSmallPhone ? 90 : 100)
-    : 120;
+  let containerHeight: number;
+  switch (deviceType) {
+    case 'phone':
+      containerHeight = isSmallPhone ? 90 : 100;
+      break;
+    case 'tablet':
+      containerHeight = 120;
+      break;
+    case 'laptop':
+      containerHeight = 130;
+      break;
+    case 'desktop':
+    case 'largeDesktop':
+      containerHeight = 140;
+      break;
+  }
   
   return {
     buttonContainerHeight: containerHeight,
@@ -278,15 +346,25 @@ export function getLandscapeLayoutConfig(config?: ResponsiveConfig): {
       contentColumnWidth = '60%';
       horizontalSpacing = 30;
       break;
-    case 'desktop':
+    case 'laptop':
       penguinColumnWidth = '35%';
       contentColumnWidth = '65%';
+      horizontalSpacing = 35;
+      break;
+    case 'desktop':
+      penguinColumnWidth = '30%';
+      contentColumnWidth = '70%';
       horizontalSpacing = 40;
+      break;
+    case 'largeDesktop':
+      penguinColumnWidth = '25%';
+      contentColumnWidth = '75%';
+      horizontalSpacing = 50;
       break;
   }
   
-  // Adjust for ultra-wide screens
-  if (aspectRatio > 2.2) {
+  // Adjust for ultra-wide screens (aspect ratio > 3/2 = 1.5)
+  if (aspectRatio > 1.5) {
     penguinColumnWidth = '30%';
     contentColumnWidth = '70%';
     horizontalSpacing = Math.min(horizontalSpacing * 1.5, 60);
@@ -385,10 +463,10 @@ function getViewBoxConfig(baseViewBox: ViewBoxDimensions): ViewBoxConfig {
   return {
     baseViewBox,
     aspectRatioThresholds: {
-      ultraWide: 2.5,  // Increased from 2.2 to catch fewer devices
-      wide: 1.8,
-      normal: 1.5,
-      tall: 0.6,       // Decreased from 0.8 to catch only very tall screens
+      ultraWide: 1.5,  // Ultra wide: aspect ratio > 3/2
+      wide: 1.3,
+      normal: 1.0,
+      tall: 0.67,      // Ultra tall: aspect ratio < 2/3 (≈0.67)
     },
     adjustments: {
       ultraWide: {
@@ -410,8 +488,12 @@ function getDeviceViewBoxScaling(deviceType: DeviceType): { width: number; heigh
       return { width: 1.0, height: 1.0 };
     case 'tablet':
       return { width: 0.95, height: 0.95 }; // Smaller viewBox for slightly larger elements
-    case 'desktop':
+    case 'laptop':
       return { width: 0.9, height: 0.9 }; // Smaller viewBox for larger elements
+    case 'desktop':
+      return { width: 0.85, height: 0.85 }; // Even smaller viewBox for larger elements
+    case 'largeDesktop':
+      return { width: 0.8, height: 0.8 }; // Smallest viewBox for largest elements
     default:
       return { width: 1.0, height: 1.0 };
   }

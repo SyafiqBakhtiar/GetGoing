@@ -12,6 +12,7 @@ import {
   Text,
   View,
 } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { Typography } from '../../utils/typography';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useBackgroundGradient, useTheme } from '../../providers/ThemeProvider';
@@ -197,6 +198,18 @@ export function WelcomeScreen({ onGetStarted, responsiveConfig }: WelcomeScreenP
     onGetStarted();
   };
 
+  // Enhanced Trust Signal Component
+  const TrustSignal = ({ spacing }: { spacing: number }) => (
+    <View style={[styles.trustSignalContainer, { marginTop: spacing }]}>
+      <View style={styles.trustItem}>
+        <Ionicons name="shield-checkmark" size={16} color="rgba(255, 255, 255, 0.8)" />
+        <Text style={[Typography.helpText, styles.trustText]}>
+          Your data stays private & secure
+        </Text>
+      </View>
+    </View>
+  );
+
   useEffect(() => {
     // Entrance animation
     Animated.parallel([
@@ -279,14 +292,14 @@ export function WelcomeScreen({ onGetStarted, responsiveConfig }: WelcomeScreenP
               {/* App branding */}
               <View style={[styles.brandingContainer, styles.brandingContainerLandscape]}>
                 <Text style={[
-                  Typography.h1,
+                  Typography.appName,
                   styles.title,
                   {
                     marginBottom: config.styles.spacing.component,
                   }
                 ]}>GetGoing</Text>
                 <Text style={[
-                  Typography.subtitle1,
+                  Typography.tagline,
                   styles.subtitle,
                 ]}>
                   Build. Achieve. Sustain.{'\n'}Repeat.
@@ -320,13 +333,7 @@ export function WelcomeScreen({ onGetStarted, responsiveConfig }: WelcomeScreenP
                     { fontSize: config.styles.fontSize.button }
                   ]}
                 />
-                <Text style={[
-                  Typography.caption,
-                  styles.trialNote,
-                  {
-                    marginTop: config.styles.spacing.component,
-                  }
-                ]}>Free trial • No signup needed</Text>
+                <TrustSignal spacing={config.styles.spacing.component} />
               </View>
             </View>
           </>
@@ -356,14 +363,14 @@ export function WelcomeScreen({ onGetStarted, responsiveConfig }: WelcomeScreenP
               {/* App branding */}
               <View style={styles.brandingContainer}>
                 <Text style={[
-                  Typography.h1,
+                  Typography.appName,
                   styles.title,
                   {
                     marginBottom: config.styles.spacing.component,
                   }
                 ]}>GetGoing</Text>
                 <Text style={[
-                  Typography.subtitle1,
+                  Typography.tagline,
                   styles.subtitle,
                 ]}>
                  Build. Achieve. Sustain.{'\n'}Repeat.
@@ -397,13 +404,7 @@ export function WelcomeScreen({ onGetStarted, responsiveConfig }: WelcomeScreenP
                   { fontSize: config.styles.fontSize.button }
                 ]}
               />
-              <Text style={[
-                Typography.caption,
-                styles.trialNote,
-                {
-                  marginTop: config.styles.spacing.component,
-                }
-              ]}>Free trial • No signup needed</Text>
+              <TrustSignal spacing={config.styles.spacing.component} />
             </View>
           </>
         )}
@@ -481,5 +482,19 @@ const styles = StyleSheet.create({
   },
   buttonContainerLandscape: {
     justifyContent: 'flex-end',
+  },
+  // Trust Signal Styles
+  trustSignalContainer: {
+    alignItems: 'center',
+    gap: 8,
+  },
+  trustItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  trustText: {
+    color: 'rgba(255, 255, 255, 0.8)',
+    textAlign: 'center',
   },
 });

@@ -140,7 +140,7 @@ export interface ScreenDimensions {
   width: number;
   height: number;
   scale: number;
-  deviceType: 'phone' | 'tablet' | 'desktop';
+  deviceType: 'phone' | 'tablet' | 'laptop' | 'desktop' | 'largeDesktop';
   isSmallPhone: boolean;
   isLargeScreen: boolean;
   isLandscape: boolean;

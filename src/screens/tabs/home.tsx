@@ -4,6 +4,7 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import { Layout } from '@/src/components/ui/Layout';
 import { Header } from '@/src/components/ui/Header';
 import { Button } from '@/src/components/ui/Button';
+import { Typography } from '@/src/utils/typography';
 import { RootStackParamList } from '@/src/navigation/types';
 
 type HomeScreenNavigationProp = StackNavigationProp<RootStackParamList>;
@@ -22,8 +23,8 @@ export default function HomeScreen() {
         subtitle="Your productivity dashboard"
       />
       <View style={styles.content}>
-        <Text style={styles.welcomeText}>Welcome to GetGoing!</Text>
-        <Text style={styles.subtitle}>Ready to build lasting habits?</Text>
+        <Text style={[Typography.h1, styles.welcomeText]}>Welcome to GetGoing!</Text>
+        <Text style={[Typography.subtitle1, styles.subtitle]}>Ready to build lasting habits?</Text>
         
         <View style={styles.buttonContainer}>
           <Button
@@ -46,13 +47,10 @@ const styles = StyleSheet.create({
     padding: 24,
   },
   welcomeText: {
-    fontSize: 24,
-    fontWeight: 'bold',
     marginBottom: 8,
     color: '#000',
   },
   subtitle: {
-    fontSize: 16,
     color: '#666',
     textAlign: 'center',
     marginBottom: 32,
